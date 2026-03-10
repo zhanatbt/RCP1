@@ -45,27 +45,24 @@ namespace WindowsFormsApp1
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(479, 198);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(359, 161);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(60, 16);
+            this.label1.Size = new System.Drawing.Size(49, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "Ед. изм.";
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(482, 228);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(4);
+            this.textBox1.Location = new System.Drawing.Point(362, 185);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(127, 22);
+            this.textBox1.Size = new System.Drawing.Size(96, 20);
             this.textBox1.TabIndex = 2;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(453, 280);
-            this.button1.Margin = new System.Windows.Forms.Padding(4);
+            this.button1.Location = new System.Drawing.Point(340, 228);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(156, 44);
+            this.button1.Size = new System.Drawing.Size(117, 36);
             this.button1.TabIndex = 3;
             this.button1.Text = "Добавить ед. изм.";
             this.button1.UseVisualStyleBackColor = true;
@@ -73,10 +70,9 @@ namespace WindowsFormsApp1
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(41, 37);
-            this.button2.Margin = new System.Windows.Forms.Padding(4);
+            this.button2.Location = new System.Drawing.Point(31, 30);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(55, 43);
+            this.button2.Size = new System.Drawing.Size(62, 35);
             this.button2.TabIndex = 4;
             this.button2.Text = "Назад";
             this.button2.UseVisualStyleBackColor = true;
@@ -87,12 +83,12 @@ namespace WindowsFormsApp1
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.first});
-            this.dataGridView1.Location = new System.Drawing.Point(84, 139);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(4);
+            this.dataGridView1.Location = new System.Drawing.Point(63, 113);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.Size = new System.Drawing.Size(320, 185);
+            this.dataGridView1.Size = new System.Drawing.Size(176, 481);
             this.dataGridView1.TabIndex = 5;
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
             // 
             // first
@@ -104,10 +100,9 @@ namespace WindowsFormsApp1
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(650, 280);
-            this.button3.Margin = new System.Windows.Forms.Padding(4);
+            this.button3.Location = new System.Drawing.Point(488, 228);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(150, 44);
+            this.button3.Size = new System.Drawing.Size(112, 36);
             this.button3.TabIndex = 6;
             this.button3.Text = "Удалить ед. изм.";
             this.button3.UseVisualStyleBackColor = true;
@@ -115,10 +110,9 @@ namespace WindowsFormsApp1
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(842, 280);
-            this.button4.Margin = new System.Windows.Forms.Padding(4);
+            this.button4.Location = new System.Drawing.Point(632, 228);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(150, 44);
+            this.button4.Size = new System.Drawing.Size(112, 36);
             this.button4.TabIndex = 7;
             this.button4.Text = "Изменить ед. изм.";
             this.button4.UseVisualStyleBackColor = true;
@@ -128,9 +122,10 @@ namespace WindowsFormsApp1
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label2.Location = new System.Drawing.Point(81, 115);
+            this.label2.Location = new System.Drawing.Point(61, 93);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(112, 15);
+            this.label2.Size = new System.Drawing.Size(106, 15);
             this.label2.TabIndex = 8;
             this.label2.Text = "Список единиц";
             // 
@@ -138,17 +133,18 @@ namespace WindowsFormsApp1
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(479, 168);
+            this.label3.Location = new System.Drawing.Point(359, 136);
+            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(74, 15);
+            this.label3.Size = new System.Drawing.Size(72, 15);
             this.label3.TabIndex = 9;
             this.label3.Text = "Действия";
             // 
             // Unit
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1067, 554);
+            this.ClientSize = new System.Drawing.Size(1060, 672);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.dataGridView1);
@@ -158,7 +154,6 @@ namespace WindowsFormsApp1
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Unit";
             this.Text = "Unit";
             this.Load += new System.EventHandler(this.Unit_Load);

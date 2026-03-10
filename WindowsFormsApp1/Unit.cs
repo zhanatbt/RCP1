@@ -17,6 +17,7 @@ namespace WindowsFormsApp1
         public Unit()
         {
             InitializeComponent();
+            UIStyle.Apply(this);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -91,8 +92,7 @@ namespace WindowsFormsApp1
         private void button2_Click(object sender, EventArgs e)
         {
             this.Hide();
-            Main main = new Main();
-            main.Show();
+            this.Close();
         }
 
     
@@ -278,6 +278,11 @@ namespace WindowsFormsApp1
 
                 db.closeConnection();
             }
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

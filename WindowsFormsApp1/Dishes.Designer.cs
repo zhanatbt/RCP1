@@ -55,11 +55,10 @@ namespace WindowsFormsApp1
             this.Column1,
             this.Column2,
             this.Type});
-            this.dataGridView1.Location = new System.Drawing.Point(113, 119);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(4);
+            this.dataGridView1.Location = new System.Drawing.Point(54, 38);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.Size = new System.Drawing.Size(456, 235);
+            this.dataGridView1.Size = new System.Drawing.Size(407, 455);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
             // 
@@ -86,10 +85,9 @@ namespace WindowsFormsApp1
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(40, 31);
-            this.button3.Margin = new System.Windows.Forms.Padding(4);
+            this.button3.Location = new System.Drawing.Point(12, 9);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(88, 39);
+            this.button3.Size = new System.Drawing.Size(66, 23);
             this.button3.TabIndex = 9;
             this.button3.Text = "Назад";
             this.button3.UseVisualStyleBackColor = true;
@@ -99,29 +97,26 @@ namespace WindowsFormsApp1
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label2.Location = new System.Drawing.Point(645, 110);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Location = new System.Drawing.Point(484, 89);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(151, 20);
+            this.label2.Size = new System.Drawing.Size(118, 16);
             this.label2.TabIndex = 11;
             this.label2.Text = "Название блюда";
             // 
             // name
             // 
-            this.name.Location = new System.Drawing.Point(649, 148);
-            this.name.Margin = new System.Windows.Forms.Padding(4);
+            this.name.Location = new System.Drawing.Point(487, 120);
             this.name.Name = "name";
             this.name.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.name.Size = new System.Drawing.Size(347, 22);
+            this.name.Size = new System.Drawing.Size(261, 20);
             this.name.TabIndex = 10;
             // 
             // comboBox1
             // 
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(649, 236);
-            this.comboBox1.Margin = new System.Windows.Forms.Padding(4);
+            this.comboBox1.Location = new System.Drawing.Point(487, 192);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(160, 24);
+            this.comboBox1.Size = new System.Drawing.Size(121, 21);
             this.comboBox1.TabIndex = 13;
             this.comboBox1.MouseHover += new System.EventHandler(this.comboBox1_MouseHover);
             // 
@@ -129,10 +124,9 @@ namespace WindowsFormsApp1
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(645, 199);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(484, 162);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(99, 20);
+            this.label1.Size = new System.Drawing.Size(77, 16);
             this.label1.TabIndex = 12;
             this.label1.Text = "Тип блюда";
             // 
@@ -140,28 +134,25 @@ namespace WindowsFormsApp1
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(645, 311);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label3.Location = new System.Drawing.Point(484, 253);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(52, 20);
+            this.label3.Size = new System.Drawing.Size(40, 16);
             this.label3.TabIndex = 15;
             this.label3.Text = "Цена";
             // 
             // Cost
             // 
-            this.Cost.Location = new System.Drawing.Point(649, 335);
-            this.Cost.Margin = new System.Windows.Forms.Padding(4);
+            this.Cost.Location = new System.Drawing.Point(487, 272);
             this.Cost.Name = "Cost";
             this.Cost.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.Cost.Size = new System.Drawing.Size(136, 22);
+            this.Cost.Size = new System.Drawing.Size(103, 20);
             this.Cost.TabIndex = 14;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(22, 448);
-            this.button2.Margin = new System.Windows.Forms.Padding(4);
+            this.button2.Location = new System.Drawing.Point(12, 514);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(266, 56);
+            this.button2.Size = new System.Drawing.Size(177, 36);
             this.button2.TabIndex = 16;
             this.button2.Text = "Изменить блюдо";
             this.button2.UseVisualStyleBackColor = true;
@@ -169,10 +160,9 @@ namespace WindowsFormsApp1
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(376, 448);
-            this.button4.Margin = new System.Windows.Forms.Padding(4);
+            this.button4.Location = new System.Drawing.Point(200, 514);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(266, 56);
+            this.button4.Size = new System.Drawing.Size(185, 36);
             this.button4.TabIndex = 17;
             this.button4.Text = "Добавить блюдо";
             this.button4.UseVisualStyleBackColor = true;
@@ -180,10 +170,9 @@ namespace WindowsFormsApp1
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(704, 448);
-            this.button5.Margin = new System.Windows.Forms.Padding(4);
+            this.button5.Location = new System.Drawing.Point(404, 514);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(266, 56);
+            this.button5.Size = new System.Drawing.Size(186, 36);
             this.button5.TabIndex = 18;
             this.button5.Text = "Удалить блюдо";
             this.button5.UseVisualStyleBackColor = true;
@@ -193,10 +182,9 @@ namespace WindowsFormsApp1
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label4.Location = new System.Drawing.Point(113, 92);
-            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label4.Location = new System.Drawing.Point(197, 12);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(112, 20);
+            this.label4.Size = new System.Drawing.Size(102, 16);
             this.label4.TabIndex = 19;
             this.label4.Text = "Список блюд";
             // 
@@ -204,18 +192,17 @@ namespace WindowsFormsApp1
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label5.Location = new System.Drawing.Point(645, 81);
-            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label5.Location = new System.Drawing.Point(484, 66);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(90, 20);
+            this.label5.Size = new System.Drawing.Size(77, 16);
             this.label5.TabIndex = 20;
             this.label5.Text = "Действия";
             // 
             // Dishes
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1067, 554);
+            this.ClientSize = new System.Drawing.Size(1055, 633);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button2);
@@ -229,7 +216,6 @@ namespace WindowsFormsApp1
             this.Controls.Add(this.name);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.dataGridView1);
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Dishes";
             this.Text = "Dishes";
             this.Load += new System.EventHandler(this.Dishes_Load);

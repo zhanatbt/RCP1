@@ -20,20 +20,20 @@ namespace WindowsFormsApp1
         public Dishes(string data)
         {
             InitializeComponent();
+            UIStyle.Apply(this);
             this.data = data;
         }
 
         public Dishes()
         {
             InitializeComponent();
+            UIStyle.Apply(this);
         }
 
 
         private void button3_Click(object sender, EventArgs e)
         {
             this.Close();
-            Main main = new Main();
-            main.Show();
         }
 
         private void Dishes_Load(object sender, EventArgs e)
