@@ -21,21 +21,24 @@ namespace WindowsFormsApp1
         private void button2_Click(object sender, EventArgs e)
         {
             this.Close();
-            Main main = new Main();
-            main.Show();
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
             dataGridView1.Rows.Clear();
             dataGridView1.AllowUserToAddRows = false;
-            DateTime dateTime1 = Convert.ToDateTime(dateTimePicker1.Text);
-            DateTime dateTime2 = Convert.ToDateTime(dateTimePicker2.Text);
+            DateTime dateTime1 = dateTimePicker1.Value.Date;
+            DateTime dateTime2 = dateTimePicker2.Value.Date;
+            if (dateTime1 > dateTime2)
+            {
+                MessageBox.Show("Дата начала больше даты конца");
+                return;
+            }
             DB db = new DB();
 
             db.openConnection();
 
-            SqlCommand command = new SqlCommand("SELECT CAST(Date_of_order as date),Sum(Summ) as Summa FROM Check_Form WHERE Date_of_order BETWEEN @dt1 AND @dt2+' 23:59:59' GROUP BY CAST(Date_of_order as date) with rollup", db.getConnection());
+            SqlCommand command = new SqlCommand("SELECT CAST(Date_of_order as date) AS OrderDate, SUM(Summ) as Summa FROM Check_Form WHERE Date_of_order >= @dt1 AND Date_of_order < DATEADD(day,1,@dt2) GROUP BY CAST(Date_of_order as date) ORDER BY CAST(Date_of_order as date)", db.getConnection());
 
             command.Parameters.Add("@dt1", SqlDbType.DateTime).Value = dateTime1;
             command.Parameters.Add("@dt2", SqlDbType.DateTime).Value = dateTime2;
@@ -60,6 +63,11 @@ namespace WindowsFormsApp1
             {
                 dataGridView1.Rows.Add(s);
             }
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

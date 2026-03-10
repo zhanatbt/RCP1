@@ -186,8 +186,6 @@ namespace WindowsFormsApp1
         private void button5_Click(object sender, EventArgs e)
         {
             this.Close();
-            Main main = new Main();
-            main.Show();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -537,8 +535,6 @@ namespace WindowsFormsApp1
         private void button3_Click_1(object sender, EventArgs e)
         {
             this.Close();
-            Orders ord = new Orders();
-            ord.Show();
         }
     }
 }

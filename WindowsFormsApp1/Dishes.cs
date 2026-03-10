@@ -32,8 +32,6 @@ namespace WindowsFormsApp1
         private void button3_Click(object sender, EventArgs e)
         {
             this.Close();
-            Main main = new Main();
-            main.Show();
         }
 
         private void Dishes_Load(object sender, EventArgs e)

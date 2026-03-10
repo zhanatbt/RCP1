@@ -21,6 +21,7 @@ namespace WindowsFormsApp1
         private void Products_Load(object sender, EventArgs e)
         {
             LoadUnitsCombo();
+            LoadProductsGrid();
         }
 
         private void LoadUnitsCombo()
@@ -46,11 +47,48 @@ namespace WindowsFormsApp1
                 db.closeConnection();
             }
         }
+
+        private void LoadProductsGrid()
+        {
+            DB db = new DB();
+            try
+            {
+                dataGridView1.Rows.Clear();
+                dataGridView1.ReadOnly = true;
+                dataGridView1.AllowUserToAddRows = false;
+
+                db.openConnection();
+                SqlCommand command = new SqlCommand("SELECT Products.ID_product, Products.Name_of_prod, Unit.Unit, Products.Cost FROM Products JOIN Unit ON Products.ID_unit = Unit.ID_unit", db.getConnection());
+                SqlDataReader reader = command.ExecuteReader();
+
+                List<string[]> list = new List<string[]>();
+                while (reader.Read())
+                {
+                    list.Add(new string[4]);
+                    list[list.Count - 1][0] = reader[0].ToString();
+                    list[list.Count - 1][1] = reader[1].ToString();
+                    list[list.Count - 1][2] = reader[2].ToString();
+                    list[list.Count - 1][3] = reader[3].ToString();
+                }
+                reader.Close();
+
+                foreach (string[] s in list)
+                {
+                    dataGridView1.Rows.Add(s);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                db.closeConnection();
+            }
+        }
         private void button3_Click(object sender, EventArgs e)
         {
-            Ingredients ingredients = new Ingredients();
             this.Close();
-            ingredients.Show();
         }
 
         private void comboBox1_MouseHover(object sender, EventArgs e)
@@ -106,10 +144,17 @@ namespace WindowsFormsApp1
             {
                 MessageBox.Show(ex.ToString());
             }
+
+            LoadProductsGrid();
             
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
         {
 
         }

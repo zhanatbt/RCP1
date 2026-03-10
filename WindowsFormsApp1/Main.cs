@@ -12,52 +12,69 @@ namespace WindowsFormsApp1
 {
     public partial class Main : Form
     {
+        private Form activeForm;
+
         public Main()
         {
             InitializeComponent();
+            OpenChildForm(new Dashboard());
+        }
+
+        public void OpenChildForm(Form child)
+        {
+            if (activeForm != null)
+            {
+                activeForm.Close();
+            }
+
+            activeForm = child;
+            child.TopLevel = false;
+            child.FormBorderStyle = FormBorderStyle.None;
+            child.Dock = DockStyle.Fill;
+            panelMain.Controls.Clear();
+            panelMain.Controls.Add(child);
+            child.Show();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            Dishes ing = new Dishes();
-            ing.Show();
+            OpenChildForm(new Dishes());
 
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            Ingredients ing = new Ingredients();
-            ing.Show();
+            OpenChildForm(new Ingredients());
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            Unit u = new Unit();
-            u.Show();
+            OpenChildForm(new Unit());
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            Orders ch = new Orders();
-            ch.Show();
+            OpenChildForm(new Orders());
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            Report report = new Report();
-            report.Show();
+            OpenChildForm(new Report());
         }
 
         private void button6_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            Calculation calc = new Calculation();
-            calc.Show();
+            OpenChildForm(new Calculation());
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new Products());
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new Dashboard());
         }
     }
 }
