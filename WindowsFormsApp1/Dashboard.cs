@@ -12,6 +12,7 @@ namespace WindowsFormsApp1
         public Dashboard()
         {
             InitializeComponent();
+            UIStyle.Apply(this);
         }
 
         private void Dashboard_Load(object sender, EventArgs e)

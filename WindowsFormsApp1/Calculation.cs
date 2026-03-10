@@ -16,6 +16,7 @@ namespace WindowsFormsApp1
         public Calculation()
         {
             InitializeComponent();
+            UIStyle.Apply(this);
         }
 
         private void button1_Click(object sender, EventArgs e)

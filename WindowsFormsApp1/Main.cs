@@ -17,6 +17,7 @@ namespace WindowsFormsApp1
         public Main()
         {
             InitializeComponent();
+            UIStyle.Apply(this);
             OpenChildForm(new Dashboard());
         }
 
@@ -32,6 +33,7 @@ namespace WindowsFormsApp1
             child.FormBorderStyle = FormBorderStyle.None;
             child.Dock = DockStyle.Fill;
             panelMain.Controls.Clear();
+            UIStyle.Apply(child);
             panelMain.Controls.Add(child);
             child.Show();
         }

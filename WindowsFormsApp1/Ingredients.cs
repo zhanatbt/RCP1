@@ -21,6 +21,7 @@ namespace WindowsFormsApp1
         public Ingredients()
         {
             InitializeComponent();
+            UIStyle.Apply(this);
         }
 
         private void Ingredients_Load(object sender, EventArgs e)

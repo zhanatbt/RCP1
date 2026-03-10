@@ -20,12 +20,14 @@ namespace WindowsFormsApp1
         public Dishes(string data)
         {
             InitializeComponent();
+            UIStyle.Apply(this);
             this.data = data;
         }
 
         public Dishes()
         {
             InitializeComponent();
+            UIStyle.Apply(this);
         }
 
 

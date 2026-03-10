@@ -103,6 +103,7 @@
     <Compile Include="Unit.Designer.cs">
       <DependentUpon>Unit.cs</DependentUpon>
     </Compile>
+    <Compile Include="UIStyle.cs" />
     <EmbeddedResource Include="Calculation.resx">
       <DependentUpon>Calculation.cs</DependentUpon>
     </EmbeddedResource>

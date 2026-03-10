@@ -17,6 +17,7 @@ namespace WindowsFormsApp1
         public Unit()
         {
             InitializeComponent();
+            UIStyle.Apply(this);
         }
 
         private void button1_Click(object sender, EventArgs e)

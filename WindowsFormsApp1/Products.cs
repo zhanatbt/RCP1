@@ -16,6 +16,7 @@ namespace WindowsFormsApp1
         public Products()
         {
             InitializeComponent();
+            UIStyle.Apply(this);
         }
 
         private void Products_Load(object sender, EventArgs e)

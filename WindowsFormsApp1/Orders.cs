@@ -17,6 +17,7 @@ namespace WindowsFormsApp1
         public Orders()
         {
             InitializeComponent();
+            UIStyle.Apply(this);
         }
 
         private void Orders_Load(object sender, EventArgs e)
