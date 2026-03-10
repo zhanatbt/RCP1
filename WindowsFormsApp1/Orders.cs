@@ -24,6 +24,7 @@ namespace WindowsFormsApp1
         {
             LoadDishesCombo();
             LoadOpenOrdersCombo();
+            UpdateActiveOrderHighlight();
         }
 
         private void LoadDishesCombo()
@@ -54,14 +55,19 @@ namespace WindowsFormsApp1
         {
             DB db = new DB();
             DataTable table = new DataTable();
+            string current = comboBox2.Text;
             try
             {
+                db.openConnection();
                 SqlCommand command = new SqlCommand("SELECT Orders.ID_order FROM Orders LEFT JOIN Check_Form ON Orders.ID_order = Check_Form.ID_order WHERE Check_Form.ID_order IS NULL GROUP BY Orders.ID_order", db.getConnection());
                 SqlDataAdapter adapter = new SqlDataAdapter(command);
                 adapter.Fill(table);
                 comboBox2.DisplayMember = "ID_order";
                 comboBox2.ValueMember = "ID_order";
                 comboBox2.DataSource = table;
+                if (!string.IsNullOrWhiteSpace(current))
+                    comboBox2.Text = current;
+                UpdateActiveOrderHighlight();
             }
             catch (Exception ex)
             {
@@ -90,16 +96,10 @@ namespace WindowsFormsApp1
 
             db.openConnection();
 
-            SqlCommand cmd = new SqlCommand("SELECT TOP(1) ID_order FROM ORDERS ORDER BY ID DESC", db.getConnection());
-
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
-            {
-                id_order = (int)reader[0] + 1;
-            }
-
-            reader.Close();
+            SqlCommand cmd = new SqlCommand("SELECT MAX(ID_order) FROM (SELECT MAX(ID_order) AS ID_order FROM Orders UNION ALL SELECT MAX(ID_order) FROM Check_Form) t", db.getConnection());
+            object lastOrderObj = cmd.ExecuteScalar();
+            if (lastOrderObj != DBNull.Value && lastOrderObj != null)
+                id_order = Convert.ToInt32(lastOrderObj) + 1;
 
             for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
             {
@@ -107,15 +107,14 @@ namespace WindowsFormsApp1
                 cmd = new SqlCommand("SELECT Id_dish,Cost FROM Dishes where Name_of_dish=@name", db.getConnection());
                 cmd.Parameters.Add("@name", SqlDbType.NVarChar).Value = dataGridView1[0, i].Value;
 
-                reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    id_dish = Convert.ToInt32(reader[0].ToString());
-                    cost = Convert.ToInt32(reader[1].ToString());
+                    while (reader.Read())
+                    {
+                        id_dish = Convert.ToInt32(reader[0].ToString());
+                        cost = Convert.ToInt32(reader[1].ToString());
+                    }
                 }
-
-                reader.Close();
 
 
 
@@ -133,7 +132,13 @@ namespace WindowsFormsApp1
                     MessageBox.Show("Error...");
             }
             if (k > 0)
-                MessageBox.Show(id_order.ToString() + " Заказ создан");
+            {
+                MessageBox.Show("Заказ №" + id_order.ToString() + " создан");
+                dataGridView1.Rows.Clear();
+                LoadOpenOrdersCombo();
+                comboBox2.Text = id_order.ToString();
+                UpdateActiveOrderHighlight();
+            }
 
         }
 
@@ -142,41 +147,19 @@ namespace WindowsFormsApp1
             LoadOpenOrdersCombo();
         }
 
+        private void comboBox2_Enter(object sender, EventArgs e)
+        {
+            RefreshOpenOrdersCombo();
+        }
+
+        private void comboBox2_DropDown(object sender, EventArgs e)
+        {
+            RefreshOpenOrdersCombo();
+        }
+
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            dataGridView1.Rows.Clear();
-            DB db = new DB();
-
-            db.openConnection();
-
-
-
-            SqlCommand command = new SqlCommand("SELECT Name_of_dish,TypeOfDish,ORDERS.Amount,Dishes.Cost FROM ORDERS JOIN Dishes ON ORDERS.ID_dish=Dishes.ID_dish JOIN Type_of_Dishes ON Dishes.Type_of_dish=Type_of_Dishes.Type_of_d WHERE ID_order=@id_ord", db.getConnection());
-            command.Parameters.Add("@id_ord", SqlDbType.Int).Value = Convert.ToInt32(comboBox2.Text);
-
-
-            SqlDataReader reader = command.ExecuteReader();
-
-            List<string[]> list = new List<string[]>();
-
-
-            while (reader.Read())
-            {
-                list.Add(new string[4]);
-
-                list[list.Count - 1][0] = reader[0].ToString();
-                list[list.Count - 1][1] = reader[1].ToString();
-                list[list.Count - 1][2] = reader[2].ToString();
-                list[list.Count - 1][3] = reader[3].ToString();
-            }
-
-            reader.Close();
-
-            db.closeConnection();
-            foreach (string[] s in list)
-            {
-                dataGridView1.Rows.Add(s);
-            }
+            UpdateActiveOrderHighlight();
         }
 
         private void comboBox1_MouseHover(object sender, EventArgs e)
@@ -240,6 +223,9 @@ namespace WindowsFormsApp1
             {
                 dataGridView1.Rows.Add(s);
             }
+
+            LoadOpenOrdersCombo();
+            UpdateActiveOrderHighlight();
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -298,29 +284,41 @@ namespace WindowsFormsApp1
             else
             {
                 reader3.Close();
-                SqlCommand command = new SqlCommand("INSERT INTO ORDERS (Date_of_order,ID_dish,Amount,Cost,ID_Order) VALUES ( GETDATE() , @id , @amount , @cost, @id_ch)", db.getConnection());
+                SqlCommand checkCmd = new SqlCommand("SELECT Amount FROM Orders WHERE ID_order=@ord AND ID_dish=@dish", db.getConnection());
+                checkCmd.Parameters.Add("@ord", SqlDbType.Int).Value = ord_id;
+                checkCmd.Parameters.Add("@dish", SqlDbType.Int).Value = id_dish;
+                object existingAmountObj = checkCmd.ExecuteScalar();
 
-                command.Parameters.Add("@id_ch", SqlDbType.NVarChar).Value = ord_id;
-                command.Parameters.Add("@id", SqlDbType.NVarChar).Value = id_dish;
-                command.Parameters.Add("@cost", SqlDbType.Int).Value = dish_cost;
-                command.Parameters.Add("@amount", SqlDbType.Int).Value = amount;
+                int rows = 0;
+                if (existingAmountObj != null && existingAmountObj != DBNull.Value)
+                {
+                    SqlCommand upd = new SqlCommand("UPDATE Orders SET Amount = Amount + @amount WHERE ID_order=@ord AND ID_dish=@dish", db.getConnection());
+                    upd.Parameters.Add("@amount", SqlDbType.Int).Value = amount;
+                    upd.Parameters.Add("@ord", SqlDbType.Int).Value = ord_id;
+                    upd.Parameters.Add("@dish", SqlDbType.Int).Value = id_dish;
+                    rows = upd.ExecuteNonQuery();
+                }
+                else
+                {
+                    SqlCommand command = new SqlCommand("INSERT INTO ORDERS (Date_of_order,ID_dish,Amount,Cost,ID_Order) VALUES ( GETDATE() , @id , @amount , @cost, @id_ch)", db.getConnection());
+                    command.Parameters.Add("@id_ch", SqlDbType.NVarChar).Value = ord_id;
+                    command.Parameters.Add("@id", SqlDbType.NVarChar).Value = id_dish;
+                    command.Parameters.Add("@cost", SqlDbType.Int).Value = dish_cost;
+                    command.Parameters.Add("@amount", SqlDbType.Int).Value = amount;
+                    rows = command.ExecuteNonQuery();
+                }
 
-
-
-                if (command.ExecuteNonQuery() == 1)
+                if (rows >= 1)
                 {
                     MessageBox.Show("Блюдо добавлено");
                     dataGridView1.Rows.Clear();
 
-
-                    command = new SqlCommand("SELECT Name_of_dish,TypeOfDish,ORDERS.Amount,Dishes.Cost FROM ORDERS JOIN Dishes ON ORDERS.ID_dish=Dishes.ID_dish JOIN Type_of_Dishes ON Dishes.Type_of_dish=Type_of_Dishes.Type_of_d WHERE ID_order=@id_ord", db.getConnection());
+                    SqlCommand command = new SqlCommand("SELECT Name_of_dish,TypeOfDish,ORDERS.Amount,Dishes.Cost FROM ORDERS JOIN Dishes ON ORDERS.ID_dish=Dishes.ID_dish JOIN Type_of_Dishes ON Dishes.Type_of_dish=Type_of_Dishes.Type_of_d WHERE ID_order=@id_ord", db.getConnection());
                     command.Parameters.Add("@id_ord", SqlDbType.Int).Value = ord_id;
-
 
                     SqlDataReader reader = command.ExecuteReader();
 
                     List<string[]> list = new List<string[]>();
-
 
                     while (reader.Read())
                     {
@@ -334,14 +332,18 @@ namespace WindowsFormsApp1
 
                     reader.Close();
 
-                    db.closeConnection();
                     foreach (string[] s in list)
                     {
                         dataGridView1.Rows.Add(s);
                     }
+
+                    LoadOpenOrdersCombo();
+                    UpdateActiveOrderHighlight();
                 }
                 else
+                {
                     MessageBox.Show("Error...");
+                }
             }
 
 
@@ -358,62 +360,13 @@ namespace WindowsFormsApp1
 
             db.openConnection();
 
-            SqlCommand cmd3 = new SqlCommand("SELECT TOP(1) ID from Orders ORDER BY ID DESC", db.getConnection());
-
-            SqlDataReader reader3 = cmd3.ExecuteReader();
-
-            if (comboBox2.Text == "")
+            if (string.IsNullOrWhiteSpace(comboBox2.Text))
             {
-
-
-                while (reader3.Read())
-                {
-                    ord_id = Convert.ToInt32(reader3[0]) + 1;
-                }
-
-                reader3.Close();
-
-
-                for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
-                {
-
-                    SqlCommand cmd5 = new SqlCommand("SELECT Id_dish,Cost FROM Dishes where Name_of_dish=@name", db.getConnection());
-                    cmd5.Parameters.Add("@name", SqlDbType.NVarChar).Value = dataGridView1[0, i].Value;
-
-                    SqlDataReader reader5 = cmd5.ExecuteReader();
-
-                    while (reader5.Read())
-                    {
-                        id_dish = Convert.ToInt32(reader5[0].ToString());
-                        cost = Convert.ToInt32(reader5[1].ToString());
-                    }
-
-                    reader5.Close();
-
-
-
-
-                    SqlCommand command = new SqlCommand("INSERT INTO Orders (Date_of_order,ID_dish,Amount,Cost,ID_order) VALUES (GETDATE() , @id_dish , @amount ,@cost,@id_order)", db.getConnection());
-                    command.Parameters.Add("@id_dish", SqlDbType.NVarChar).Value = id_dish;
-                    command.Parameters.Add("@cost", SqlDbType.Int).Value = cost;
-                    command.Parameters.Add("@id_order", SqlDbType.Int).Value = ord_id;
-                    command.Parameters.Add("@amount", SqlDbType.Int).Value = dataGridView1[2, i].Value;
-
-
-
-                    if (command.ExecuteNonQuery() == 1)
-                        k++;
-                    else
-                        MessageBox.Show("Error...");
-                }
-                reader3.Close();
-                if (k > 0)
-                    MessageBox.Show("Заказ создан");
+                MessageBox.Show("Выберите заказ для оплаты");
+                db.closeConnection();
+                return;
             }
-            else
-                ord_id = Convert.ToInt32(comboBox2.Text);
-
-            reader3.Close();
+            ord_id = Convert.ToInt32(comboBox2.Text);
 
 
             SqlCommand cmd = new SqlCommand("SELECT TOP(1) ID_check from Check_Form ORDER BY ID_check DESC", db.getConnection());
@@ -459,8 +412,9 @@ namespace WindowsFormsApp1
                 MessageBox.Show("Error...");
 
             dataGridView1.Rows.Clear();
-
-
+            cmd2.ExecuteNonQuery();
+            LoadOpenOrdersCombo();
+            UpdateActiveOrderHighlight();
             db.closeConnection();
         }
 
@@ -533,9 +487,164 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void button3_Click_1(object sender, EventArgs e)
+        private void button7_Click(object sender, EventArgs e)
         {
-            this.Close();
+            dataGridView1.Rows.Clear();
+            comboBox2.SelectedIndex = -1;
+            comboBox2.Text = "";
+            UpdateActiveOrderHighlight();
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(comboBox2.Text))
+            {
+                MessageBox.Show("Выберите заказ");
+                return;
+            }
+
+            int ord_id;
+            if (!int.TryParse(comboBox2.Text, out ord_id))
+            {
+                MessageBox.Show("Неверный номер заказа");
+                return;
+            }
+
+            LoadOrderToGrid(ord_id);
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(comboBox2.Text))
+            {
+                MessageBox.Show("Выберите заказ");
+                return;
+            }
+            if (dataGridView1.Rows.Count <= 1)
+            {
+                MessageBox.Show("Добавьте блюда в заказ");
+                return;
+            }
+
+            int ord_id;
+            if (!int.TryParse(comboBox2.Text, out ord_id))
+            {
+                MessageBox.Show("Неверный номер заказа");
+                return;
+            }
+
+            SaveGridToExistingOrder(ord_id);
+            LoadOrderToGrid(ord_id);
+            LoadOpenOrdersCombo();
+            UpdateActiveOrderHighlight();
+        }
+
+        private void RefreshOpenOrdersCombo()
+        {
+            string current = comboBox2.Text;
+            LoadOpenOrdersCombo();
+            if (!string.IsNullOrWhiteSpace(current))
+                comboBox2.Text = current;
+            UpdateActiveOrderHighlight();
+        }
+
+        private void LoadOrderToGrid(int ord_id)
+        {
+            dataGridView1.Rows.Clear();
+            DB db = new DB();
+
+            db.openConnection();
+
+            SqlCommand command = new SqlCommand("SELECT Name_of_dish,TypeOfDish,ORDERS.Amount,Dishes.Cost FROM ORDERS JOIN Dishes ON ORDERS.ID_dish=Dishes.ID_dish JOIN Type_of_Dishes ON Dishes.Type_of_dish=Type_of_Dishes.Type_of_d WHERE ID_order=@id_ord", db.getConnection());
+            command.Parameters.Add("@id_ord", SqlDbType.Int).Value = ord_id;
+
+            SqlDataReader reader = command.ExecuteReader();
+
+            List<string[]> list = new List<string[]>();
+
+            while (reader.Read())
+            {
+                list.Add(new string[4]);
+
+                list[list.Count - 1][0] = reader[0].ToString();
+                list[list.Count - 1][1] = reader[1].ToString();
+                list[list.Count - 1][2] = reader[2].ToString();
+                list[list.Count - 1][3] = reader[3].ToString();
+            }
+
+            reader.Close();
+
+            db.closeConnection();
+            foreach (string[] s in list)
+            {
+                dataGridView1.Rows.Add(s);
+            }
+
+            UpdateActiveOrderHighlight();
+        }
+
+        private void SaveGridToExistingOrder(int ord_id)
+        {
+            DB db = new DB();
+            int id_dish = 0;
+            int cost = 0;
+            int k = 0;
+
+            db.openConnection();
+
+            SqlCommand checkCmd = new SqlCommand("SELECT ID_check FROM Check_Form WHERE ID_order=@id_ch", db.getConnection());
+            checkCmd.Parameters.Add("@id_ch", SqlDbType.NVarChar).Value = ord_id;
+            SqlDataReader reader = checkCmd.ExecuteReader();
+            if (reader.HasRows)
+            {
+                reader.Close();
+                db.closeConnection();
+                MessageBox.Show("Чек закрыт");
+                return;
+            }
+            reader.Close();
+
+            SqlCommand del = new SqlCommand("DELETE FROM Orders WHERE ID_order=@id", db.getConnection());
+            del.Parameters.Add("@id", SqlDbType.Int).Value = ord_id;
+            del.ExecuteNonQuery();
+
+            for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
+            {
+                SqlCommand cmd = new SqlCommand("SELECT Id_dish,Cost FROM Dishes where Name_of_dish=@name", db.getConnection());
+                cmd.Parameters.Add("@name", SqlDbType.NVarChar).Value = dataGridView1[0, i].Value;
+
+                using (SqlDataReader r = cmd.ExecuteReader())
+                {
+                    while (r.Read())
+                    {
+                        id_dish = Convert.ToInt32(r[0].ToString());
+                        cost = Convert.ToInt32(r[1].ToString());
+                    }
+                }
+
+                SqlCommand ins = new SqlCommand("INSERT INTO Orders (Date_of_order,ID_dish,Amount,Cost,ID_order) VALUES (GETDATE() , @id_dish , @amount ,@cost,@id_order)", db.getConnection());
+                ins.Parameters.Add("@id_dish", SqlDbType.NVarChar).Value = id_dish;
+                ins.Parameters.Add("@cost", SqlDbType.Int).Value = cost;
+                ins.Parameters.Add("@id_order", SqlDbType.Int).Value = ord_id;
+                ins.Parameters.Add("@amount", SqlDbType.Int).Value = dataGridView1[2, i].Value;
+
+                if (ins.ExecuteNonQuery() == 1)
+                    k++;
+            }
+
+            db.closeConnection();
+
+            if (k > 0)
+                MessageBox.Show("Заказ обновлен");
+            else
+                MessageBox.Show("Error...");
+        }
+
+        private void UpdateActiveOrderHighlight()
+        {
+            comboBox2.BackColor = string.IsNullOrWhiteSpace(comboBox2.Text)
+                ? SystemColors.Window
+                : Color.LemonChiffon;
         }
     }
 }
