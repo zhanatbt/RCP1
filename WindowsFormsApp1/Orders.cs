@@ -384,10 +384,6 @@ namespace WindowsFormsApp1
             SqlCommand command2 = new SqlCommand("SELECT ID_order, SUM(Cost*Amount) FROM ORDERS WHERE ID_Order = @id GROUP BY ID_Order", db.getConnection());
             command2.Parameters.Add("@id", SqlDbType.NVarChar).Value = ord_id;
 
-            SqlCommand cmd2 = new SqlCommand("DELETE FROM ORDERS WHERE ID_order=@id", db.getConnection());
-            cmd2.Parameters.Add("@id", SqlDbType.Int).Value = ord_id;
-
-
             SqlDataReader reader2 = command2.ExecuteReader();
 
             while (reader2.Read())
@@ -412,7 +408,6 @@ namespace WindowsFormsApp1
                 MessageBox.Show("Error...");
 
             dataGridView1.Rows.Clear();
-            cmd2.ExecuteNonQuery();
             LoadOpenOrdersCombo();
             UpdateActiveOrderHighlight();
             db.closeConnection();

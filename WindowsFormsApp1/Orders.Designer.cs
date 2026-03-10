@@ -56,10 +56,10 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(32, 213);
+            this.button1.Location = new System.Drawing.Point(32, 201);
             this.button1.Margin = new System.Windows.Forms.Padding(2);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(171, 37);
+            this.button1.Size = new System.Drawing.Size(83, 44);
             this.button1.TabIndex = 0;
             this.button1.Text = "Создать заказ";
             this.button1.UseVisualStyleBackColor = true;
@@ -67,7 +67,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(122, 280);
+            this.button2.Location = new System.Drawing.Point(122, 367);
             this.button2.Margin = new System.Windows.Forms.Padding(2);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(82, 54);
@@ -75,39 +75,6 @@
             this.button2.Text = "Удалить заказ";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // button7
-            // 
-            this.button7.Location = new System.Drawing.Point(32, 255);
-            this.button7.Margin = new System.Windows.Forms.Padding(2);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(171, 24);
-            this.button7.TabIndex = 23;
-            this.button7.Text = "Новый заказ";
-            this.button7.UseVisualStyleBackColor = true;
-            this.button7.Click += new System.EventHandler(this.button7_Click);
-            // 
-            // button8
-            // 
-            this.button8.Location = new System.Drawing.Point(136, 160);
-            this.button8.Margin = new System.Windows.Forms.Padding(2);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(83, 23);
-            this.button8.TabIndex = 24;
-            this.button8.Text = "Выбрать";
-            this.button8.UseVisualStyleBackColor = true;
-            this.button8.Click += new System.EventHandler(this.button8_Click);
-            // 
-            // button9
-            // 
-            this.button9.Location = new System.Drawing.Point(53, 186);
-            this.button9.Margin = new System.Windows.Forms.Padding(2);
-            this.button9.Name = "button9";
-            this.button9.Size = new System.Drawing.Size(166, 23);
-            this.button9.TabIndex = 25;
-            this.button9.Text = "Сохранить заказ";
-            this.button9.UseVisualStyleBackColor = true;
-            this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
             // dataGridView1
             // 
@@ -154,7 +121,7 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(27, 280);
+            this.button4.Location = new System.Drawing.Point(28, 367);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(87, 54);
             this.button4.TabIndex = 7;
@@ -201,15 +168,15 @@
             // comboBox2
             // 
             this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(53, 161);
+            this.comboBox2.Location = new System.Drawing.Point(32, 161);
             this.comboBox2.Margin = new System.Windows.Forms.Padding(2);
             this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(79, 21);
+            this.comboBox2.Size = new System.Drawing.Size(100, 21);
             this.comboBox2.TabIndex = 13;
-            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
             this.comboBox2.DropDown += new System.EventHandler(this.comboBox2_DropDown);
-            this.comboBox2.MouseHover += new System.EventHandler(this.comboBox2_MouseHover);
+            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
             this.comboBox2.Enter += new System.EventHandler(this.comboBox2_Enter);
+            this.comboBox2.MouseHover += new System.EventHandler(this.comboBox2_MouseHover);
             // 
             // button5
             // 
@@ -240,6 +207,39 @@
             this.button6.Text = "Добавить в список";
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // button7
+            // 
+            this.button7.Location = new System.Drawing.Point(136, 201);
+            this.button7.Margin = new System.Windows.Forms.Padding(2);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(83, 44);
+            this.button7.TabIndex = 23;
+            this.button7.Text = "Новый заказ";
+            this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
+            // 
+            // button8
+            // 
+            this.button8.Location = new System.Drawing.Point(136, 160);
+            this.button8.Margin = new System.Windows.Forms.Padding(2);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(83, 23);
+            this.button8.TabIndex = 24;
+            this.button8.Text = "Выбрать";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
+            // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(32, 262);
+            this.button9.Margin = new System.Windows.Forms.Padding(2);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(187, 23);
+            this.button9.TabIndex = 25;
+            this.button9.Text = "Сохранить заказ";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
             // textBox1
             // 

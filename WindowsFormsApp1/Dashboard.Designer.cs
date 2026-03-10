@@ -287,6 +287,7 @@ namespace WindowsFormsApp1
             this.Name = "Dashboard";
             this.Text = "Dashboard";
             this.Load += new System.EventHandler(this.Dashboard_Load);
+            this.Activated += new System.EventHandler(this.Dashboard_Activated);
             this.groupStats.ResumeLayout(false);
             this.groupStats.PerformLayout();
             this.groupActions.ResumeLayout(false);

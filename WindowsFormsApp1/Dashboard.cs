@@ -22,6 +22,13 @@ namespace WindowsFormsApp1
             LoadPopularDishes();
         }
 
+        private void Dashboard_Activated(object sender, EventArgs e)
+        {
+            LoadStats();
+            LoadRecentChecks();
+            LoadPopularDishes();
+        }
+
         private void LoadStats()
         {
             DB db = new DB();
@@ -33,7 +40,7 @@ namespace WindowsFormsApp1
                     "SELECT COUNT(DISTINCT ID_order) FROM Check_Form WHERE CAST(Date_of_order AS DATE) = CAST(GETDATE() AS DATE)",
                     db.getConnection());
                 SqlCommand cmdActiveOrders = new SqlCommand(
-                    "SELECT COUNT(DISTINCT ID_order) FROM Orders",
+                    "SELECT COUNT(DISTINCT Orders.ID_order) FROM Orders LEFT JOIN Check_Form ON Orders.ID_order = Check_Form.ID_order WHERE Check_Form.ID_order IS NULL",
                     db.getConnection());
                 SqlCommand cmdRevenueToday = new SqlCommand(
                     "SELECT SUM(Summ) FROM Check_Form WHERE CAST(Date_of_order AS DATE) = CAST(GETDATE() AS DATE)",
@@ -42,16 +49,29 @@ namespace WindowsFormsApp1
                     "SELECT COUNT(*) FROM Dishes",
                     db.getConnection());
 
-                lblTodayOrdersValue.Text = Convert.ToInt32(cmdTodayOrders.ExecuteScalar()).ToString();
-                lblActiveOrdersValue.Text = Convert.ToInt32(cmdActiveOrders.ExecuteScalar()).ToString();
+                object todayOrdersObj = cmdTodayOrders.ExecuteScalar();
+                int todayOrders = (todayOrdersObj == DBNull.Value || todayOrdersObj == null) ? 0 : Convert.ToInt32(todayOrdersObj);
+
+                object activeOrdersObj = cmdActiveOrders.ExecuteScalar();
+                int activeOrders = (activeOrdersObj == DBNull.Value || activeOrdersObj == null) ? 0 : Convert.ToInt32(activeOrdersObj);
 
                 object revenueObj = cmdRevenueToday.ExecuteScalar();
                 decimal revenue = 0m;
                 if (revenueObj != DBNull.Value && revenueObj != null)
                     revenue = Convert.ToDecimal(revenueObj);
-                lblRevenueTodayValue.Text = revenue.ToString("0.##");
 
-                lblTotalDishesValue.Text = Convert.ToInt32(cmdTotalDishes.ExecuteScalar()).ToString();
+                object totalDishesObj = cmdTotalDishes.ExecuteScalar();
+                int totalDishes = (totalDishesObj == DBNull.Value || totalDishesObj == null) ? 0 : Convert.ToInt32(totalDishesObj);
+
+                lblTodayOrders.Text = "Сегодня заказов: " + todayOrders.ToString();
+                lblActiveOrders.Text = "Активные заказы: " + activeOrders.ToString();
+                lblRevenueToday.Text = "Выручка сегодня: " + revenue.ToString("0.##");
+                lblTotalDishes.Text = "Всего блюд: " + totalDishes.ToString();
+
+                lblTodayOrdersValue.Visible = false;
+                lblActiveOrdersValue.Visible = false;
+                lblRevenueTodayValue.Visible = false;
+                lblTotalDishesValue.Visible = false;
             }
             catch (Exception ex)
             {
