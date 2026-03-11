@@ -29,6 +29,10 @@
         private void InitializeComponent()
         {
             this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPageList = new System.Windows.Forms.TabPage();
+            this.tabPageAdd = new System.Windows.Forms.TabPage();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -37,18 +41,20 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.colId = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colUnit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colCost = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tabControl1.SuspendLayout();
+            this.tabPageList.SuspendLayout();
+            this.tabPageAdd.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(744, 260);
+            this.button1.Location = new System.Drawing.Point(124, 217);
             this.button1.Margin = new System.Windows.Forms.Padding(2);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(175, 36);
@@ -57,9 +63,63 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(10, 530);
+            this.button2.Margin = new System.Windows.Forms.Padding(2);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(175, 36);
+            this.button2.TabIndex = 16;
+            this.button2.Text = "Удалить продукт";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPageList);
+            this.tabControl1.Controls.Add(this.tabPageAdd);
+            this.tabControl1.Location = new System.Drawing.Point(23, 50);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(2);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(896, 600);
+            this.tabControl1.TabIndex = 16;
+            // 
+            // tabPageList
+            // 
+            this.tabPageList.Controls.Add(this.dataGridView1);
+            this.tabPageList.Controls.Add(this.button2);
+            this.tabPageList.Location = new System.Drawing.Point(4, 22);
+            this.tabPageList.Margin = new System.Windows.Forms.Padding(2);
+            this.tabPageList.Name = "tabPageList";
+            this.tabPageList.Padding = new System.Windows.Forms.Padding(2);
+            this.tabPageList.Size = new System.Drawing.Size(888, 574);
+            this.tabPageList.TabIndex = 0;
+            this.tabPageList.Text = "Список продуктов";
+            this.tabPageList.UseVisualStyleBackColor = true;
+            // 
+            // tabPageAdd
+            // 
+            this.tabPageAdd.Controls.Add(this.label4);
+            this.tabPageAdd.Controls.Add(this.label1);
+            this.tabPageAdd.Controls.Add(this.textBox1);
+            this.tabPageAdd.Controls.Add(this.label2);
+            this.tabPageAdd.Controls.Add(this.comboBox1);
+            this.tabPageAdd.Controls.Add(this.label3);
+            this.tabPageAdd.Controls.Add(this.textBox2);
+            this.tabPageAdd.Controls.Add(this.button1);
+            this.tabPageAdd.Location = new System.Drawing.Point(4, 22);
+            this.tabPageAdd.Margin = new System.Windows.Forms.Padding(2);
+            this.tabPageAdd.Name = "tabPageAdd";
+            this.tabPageAdd.Padding = new System.Windows.Forms.Padding(2);
+            this.tabPageAdd.Size = new System.Drawing.Size(888, 574);
+            this.tabPageAdd.TabIndex = 1;
+            this.tabPageAdd.Text = "Добавить продукт";
+            this.tabPageAdd.UseVisualStyleBackColor = true;
+            // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(719, 101);
+            this.textBox1.Location = new System.Drawing.Point(99, 58);
             this.textBox1.Margin = new System.Windows.Forms.Padding(2);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(200, 20);
@@ -68,7 +128,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(621, 104);
+            this.label1.Location = new System.Drawing.Point(1, 61);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(83, 13);
@@ -78,7 +138,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(655, 154);
+            this.label2.Location = new System.Drawing.Point(35, 111);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(49, 13);
@@ -88,7 +148,7 @@
             // comboBox1
             // 
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(719, 146);
+            this.comboBox1.Location = new System.Drawing.Point(99, 103);
             this.comboBox1.Margin = new System.Windows.Forms.Padding(2);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(200, 21);
@@ -99,7 +159,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(666, 207);
+            this.label3.Location = new System.Drawing.Point(46, 164);
             this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(33, 13);
@@ -108,7 +168,7 @@
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(799, 207);
+            this.textBox2.Location = new System.Drawing.Point(179, 164);
             this.textBox2.Margin = new System.Windows.Forms.Padding(2);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(120, 20);
@@ -128,22 +188,12 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label4.Location = new System.Drawing.Point(666, 50);
+            this.label4.Location = new System.Drawing.Point(46, 11);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(176, 15);
             this.label4.TabIndex = 13;
             this.label4.Text = "Добавить новый продукт";
             this.label4.Click += new System.EventHandler(this.label4_Click);
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label5.Location = new System.Drawing.Point(276, 20);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(127, 15);
-            this.label5.TabIndex = 14;
-            this.label5.Text = "Список продуктов";
             // 
             // dataGridView1
             // 
@@ -153,10 +203,10 @@
             this.colName,
             this.colUnit,
             this.colCost});
-            this.dataGridView1.Location = new System.Drawing.Point(23, 50);
+            this.dataGridView1.Location = new System.Drawing.Point(10, 10);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.Size = new System.Drawing.Size(588, 550);
+            this.dataGridView1.Size = new System.Drawing.Size(866, 510);
             this.dataGridView1.TabIndex = 15;
             // 
             // colId
@@ -192,21 +242,16 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1047, 751);
-            this.Controls.Add(this.dataGridView1);
-            this.Controls.Add(this.label5);
             this.Controls.Add(this.button3);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.comboBox1);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.label4);
+            this.Controls.Add(this.tabControl1);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Products";
             this.Text = "Products";
             this.Load += new System.EventHandler(this.Products_Load);
+            this.tabControl1.ResumeLayout(false);
+            this.tabPageList.ResumeLayout(false);
+            this.tabPageAdd.ResumeLayout(false);
+            this.tabPageAdd.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -216,6 +261,10 @@
         #endregion
 
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPageList;
+        private System.Windows.Forms.TabPage tabPageAdd;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
@@ -224,7 +273,6 @@
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.DataGridViewTextBoxColumn colId;
         private System.Windows.Forms.DataGridViewTextBoxColumn colName;
