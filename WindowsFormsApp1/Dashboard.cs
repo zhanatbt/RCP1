@@ -94,7 +94,7 @@ namespace WindowsFormsApp1
 
                 db.openConnection();
                 SqlCommand cmd = new SqlCommand(
-                    "SELECT TOP 10 ID_order, Date_of_order, Summ FROM Check_Form ORDER BY Date_of_order DESC",
+                    "SELECT TOP 10 ID_order, Date_of_order, Summ FROM Check_Form WHERE CAST(Date_of_order AS DATE) = CAST(GETDATE() AS DATE) ORDER BY Date_of_order DESC",
                     db.getConnection());
 
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -134,7 +134,7 @@ namespace WindowsFormsApp1
 
                 db.openConnection();
                 SqlCommand cmd = new SqlCommand(
-                    "SELECT Dishes.Name_of_dish, SUM(Orders.Amount) AS Sales FROM Orders JOIN Dishes ON Orders.ID_dish = Dishes.ID_dish GROUP BY Dishes.Name_of_dish ORDER BY Sales DESC",
+                    "SELECT Dishes.Name_of_dish, SUM(Orders.Amount) AS Sales FROM Orders JOIN Dishes ON Orders.ID_dish = Dishes.ID_dish WHERE YEAR(Orders.Date_of_order)=YEAR(GETDATE()) AND MONTH(Orders.Date_of_order)=MONTH(GETDATE()) GROUP BY Dishes.Name_of_dish ORDER BY Sales DESC",
                     db.getConnection());
 
                 SqlDataReader reader = cmd.ExecuteReader();
