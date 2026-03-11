@@ -54,17 +54,24 @@ namespace WindowsFormsApp1
         private void LoadOpenOrdersCombo()
         {
             DB db = new DB();
-            DataTable table = new DataTable();
             string current = comboBox2.Text;
             try
             {
                 db.openConnection();
-                SqlCommand command = new SqlCommand("SELECT Orders.ID_order FROM Orders LEFT JOIN Check_Form ON Orders.ID_order = Check_Form.ID_order WHERE Check_Form.ID_order IS NULL GROUP BY Orders.ID_order", db.getConnection());
+                SqlCommand command = new SqlCommand(
+                    "SELECT DISTINCT o.ID_order " +
+                    "FROM Orders o " +
+                    "WHERE CAST(o.Date_of_order AS DATE)=CAST(GETDATE() AS DATE) " +
+                    "AND NOT EXISTS (SELECT 1 FROM Check_Form c WHERE c.ID_order=o.ID_order AND CAST(c.Date_of_order AS DATE)=CAST(GETDATE() AS DATE)) " +
+                    "ORDER BY o.ID_order",
+                    db.getConnection());
                 SqlDataAdapter adapter = new SqlDataAdapter(command);
+                DataTable table = new DataTable();
                 adapter.Fill(table);
                 comboBox2.DisplayMember = "ID_order";
                 comboBox2.ValueMember = "ID_order";
                 comboBox2.DataSource = table;
+
                 if (!string.IsNullOrWhiteSpace(current))
                     comboBox2.Text = current;
                 UpdateActiveOrderHighlight();
@@ -96,10 +103,17 @@ namespace WindowsFormsApp1
 
             db.openConnection();
 
-            SqlCommand cmd = new SqlCommand("SELECT MAX(ID_order) FROM (SELECT MAX(ID_order) AS ID_order FROM Orders UNION ALL SELECT MAX(ID_order) FROM Check_Form) t", db.getConnection());
+            SqlCommand cmd = new SqlCommand(
+                "SELECT MAX(ID_order) FROM ( " +
+                "SELECT MAX(ID_order) AS ID_order FROM Orders WHERE CAST(Date_of_order AS DATE)=CAST(GETDATE() AS DATE) " +
+                "UNION ALL " +
+                "SELECT MAX(ID_order) FROM Check_Form WHERE CAST(Date_of_order AS DATE)=CAST(GETDATE() AS DATE) " +
+                ") t", db.getConnection());
             object lastOrderObj = cmd.ExecuteScalar();
             if (lastOrderObj != DBNull.Value && lastOrderObj != null)
                 id_order = Convert.ToInt32(lastOrderObj) + 1;
+            else
+                id_order = 1;
 
             for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
             {
@@ -185,7 +199,7 @@ namespace WindowsFormsApp1
 
             db.openConnection();
 
-            SqlCommand cmd = new SqlCommand("DELETE FROM ORDERS WHERE ID_order=@id", db.getConnection());
+            SqlCommand cmd = new SqlCommand("DELETE FROM ORDERS WHERE ID_order=@id AND CAST(Date_of_order AS DATE)=CAST(GETDATE() AS DATE)", db.getConnection());
             cmd.Parameters.Add("@id", SqlDbType.Int).Value = ord_id;
 
             if (cmd.ExecuteNonQuery() >= 1)
@@ -197,7 +211,7 @@ namespace WindowsFormsApp1
             dataGridView1.Rows.Clear();
 
 
-            cmd = new SqlCommand("SELECT Name_of_dish,TypeOfDish,ORDERS.Amount,Dishes.Cost FROM ORDERS JOIN Dishes ON ORDERS.ID_dish=Dishes.ID_dish JOIN Type_of_Dishes ON Dishes.Type_of_dish=Type_of_Dishes.Type_of_d WHERE ID_order=@id_ord", db.getConnection());
+            cmd = new SqlCommand("SELECT Name_of_dish,TypeOfDish,ORDERS.Amount,Dishes.Cost FROM ORDERS JOIN Dishes ON ORDERS.ID_dish=Dishes.ID_dish JOIN Type_of_Dishes ON Dishes.Type_of_dish=Type_of_Dishes.Type_of_d WHERE ID_order=@id_ord AND CAST(ORDERS.Date_of_order AS DATE)=CAST(GETDATE() AS DATE)", db.getConnection());
             cmd.Parameters.Add("@id_ord", SqlDbType.Int).Value = ord_id;
 
 
@@ -270,7 +284,7 @@ namespace WindowsFormsApp1
 
             reader2.Close();
 
-            cmd = new SqlCommand("SELECT ID_check FROM Check_Form where ID_order=@id_ch", db.getConnection());
+            cmd = new SqlCommand("SELECT ID_check FROM Check_Form where ID_order=@id_ch AND CAST(Date_of_order AS DATE)=CAST(GETDATE() AS DATE)", db.getConnection());
             cmd.Parameters.Add("@id_ch", SqlDbType.NVarChar).Value = ord_id;
 
             SqlDataReader reader3 = cmd.ExecuteReader();
@@ -284,7 +298,7 @@ namespace WindowsFormsApp1
             else
             {
                 reader3.Close();
-                SqlCommand checkCmd = new SqlCommand("SELECT Amount FROM Orders WHERE ID_order=@ord AND ID_dish=@dish", db.getConnection());
+                SqlCommand checkCmd = new SqlCommand("SELECT Amount FROM Orders WHERE ID_order=@ord AND ID_dish=@dish AND CAST(Date_of_order AS DATE)=CAST(GETDATE() AS DATE)", db.getConnection());
                 checkCmd.Parameters.Add("@ord", SqlDbType.Int).Value = ord_id;
                 checkCmd.Parameters.Add("@dish", SqlDbType.Int).Value = id_dish;
                 object existingAmountObj = checkCmd.ExecuteScalar();
@@ -292,7 +306,7 @@ namespace WindowsFormsApp1
                 int rows = 0;
                 if (existingAmountObj != null && existingAmountObj != DBNull.Value)
                 {
-                    SqlCommand upd = new SqlCommand("UPDATE Orders SET Amount = Amount + @amount WHERE ID_order=@ord AND ID_dish=@dish", db.getConnection());
+                    SqlCommand upd = new SqlCommand("UPDATE Orders SET Amount = Amount + @amount WHERE ID_order=@ord AND ID_dish=@dish AND CAST(Date_of_order AS DATE)=CAST(GETDATE() AS DATE)", db.getConnection());
                     upd.Parameters.Add("@amount", SqlDbType.Int).Value = amount;
                     upd.Parameters.Add("@ord", SqlDbType.Int).Value = ord_id;
                     upd.Parameters.Add("@dish", SqlDbType.Int).Value = id_dish;
@@ -313,7 +327,7 @@ namespace WindowsFormsApp1
                     MessageBox.Show("Блюдо добавлено");
                     dataGridView1.Rows.Clear();
 
-                    SqlCommand command = new SqlCommand("SELECT Name_of_dish,TypeOfDish,ORDERS.Amount,Dishes.Cost FROM ORDERS JOIN Dishes ON ORDERS.ID_dish=Dishes.ID_dish JOIN Type_of_Dishes ON Dishes.Type_of_dish=Type_of_Dishes.Type_of_d WHERE ID_order=@id_ord", db.getConnection());
+                    SqlCommand command = new SqlCommand("SELECT Name_of_dish,TypeOfDish,ORDERS.Amount,Dishes.Cost FROM ORDERS JOIN Dishes ON ORDERS.ID_dish=Dishes.ID_dish JOIN Type_of_Dishes ON Dishes.Type_of_dish=Type_of_Dishes.Type_of_d WHERE ID_order=@id_ord AND CAST(ORDERS.Date_of_order AS DATE)=CAST(GETDATE() AS DATE)", db.getConnection());
                     command.Parameters.Add("@id_ord", SqlDbType.Int).Value = ord_id;
 
                     SqlDataReader reader = command.ExecuteReader();
@@ -381,7 +395,7 @@ namespace WindowsFormsApp1
             reader.Close();
 
 
-            SqlCommand command2 = new SqlCommand("SELECT ID_order, SUM(Cost*Amount) FROM ORDERS WHERE ID_Order = @id GROUP BY ID_Order", db.getConnection());
+            SqlCommand command2 = new SqlCommand("SELECT ID_order, SUM(Cost*Amount) FROM ORDERS WHERE ID_Order = @id AND CAST(Date_of_order AS DATE)=CAST(GETDATE() AS DATE) GROUP BY ID_Order", db.getConnection());
             command2.Parameters.Add("@id", SqlDbType.NVarChar).Value = ord_id;
 
             SqlDataReader reader2 = command2.ExecuteReader();
@@ -550,7 +564,7 @@ namespace WindowsFormsApp1
 
             db.openConnection();
 
-            SqlCommand command = new SqlCommand("SELECT Name_of_dish,TypeOfDish,ORDERS.Amount,Dishes.Cost FROM ORDERS JOIN Dishes ON ORDERS.ID_dish=Dishes.ID_dish JOIN Type_of_Dishes ON Dishes.Type_of_dish=Type_of_Dishes.Type_of_d WHERE ID_order=@id_ord", db.getConnection());
+            SqlCommand command = new SqlCommand("SELECT Name_of_dish,TypeOfDish,ORDERS.Amount,Dishes.Cost FROM ORDERS JOIN Dishes ON ORDERS.ID_dish=Dishes.ID_dish JOIN Type_of_Dishes ON Dishes.Type_of_dish=Type_of_Dishes.Type_of_d WHERE ID_order=@id_ord AND CAST(ORDERS.Date_of_order AS DATE)=CAST(GETDATE() AS DATE)", db.getConnection());
             command.Parameters.Add("@id_ord", SqlDbType.Int).Value = ord_id;
 
             SqlDataReader reader = command.ExecuteReader();
@@ -587,7 +601,7 @@ namespace WindowsFormsApp1
 
             db.openConnection();
 
-            SqlCommand checkCmd = new SqlCommand("SELECT ID_check FROM Check_Form WHERE ID_order=@id_ch", db.getConnection());
+            SqlCommand checkCmd = new SqlCommand("SELECT ID_check FROM Check_Form WHERE ID_order=@id_ch AND CAST(Date_of_order AS DATE)=CAST(GETDATE() AS DATE)", db.getConnection());
             checkCmd.Parameters.Add("@id_ch", SqlDbType.NVarChar).Value = ord_id;
             SqlDataReader reader = checkCmd.ExecuteReader();
             if (reader.HasRows)
@@ -599,7 +613,7 @@ namespace WindowsFormsApp1
             }
             reader.Close();
 
-            SqlCommand del = new SqlCommand("DELETE FROM Orders WHERE ID_order=@id", db.getConnection());
+            SqlCommand del = new SqlCommand("DELETE FROM Orders WHERE ID_order=@id AND CAST(Date_of_order AS DATE)=CAST(GETDATE() AS DATE)", db.getConnection());
             del.Parameters.Add("@id", SqlDbType.Int).Value = ord_id;
             del.ExecuteNonQuery();
 

@@ -173,10 +173,7 @@
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(100, 21);
             this.comboBox2.TabIndex = 13;
-            this.comboBox2.DropDown += new System.EventHandler(this.comboBox2_DropDown);
             this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
-            this.comboBox2.Enter += new System.EventHandler(this.comboBox2_Enter);
-            this.comboBox2.MouseHover += new System.EventHandler(this.comboBox2_MouseHover);
             // 
             // button5
             // 
