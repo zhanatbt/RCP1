@@ -33,6 +33,8 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPageList = new System.Windows.Forms.TabPage();
             this.tabPageAdd = new System.Windows.Forms.TabPage();
+            this.button4 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -65,7 +67,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(10, 530);
+            this.button2.Location = new System.Drawing.Point(124, 307);
             this.button2.Margin = new System.Windows.Forms.Padding(2);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(175, 36);
@@ -88,7 +90,7 @@
             // tabPageList
             // 
             this.tabPageList.Controls.Add(this.dataGridView1);
-            this.tabPageList.Controls.Add(this.button2);
+            this.tabPageList.Controls.Add(this.button5);
             this.tabPageList.Location = new System.Drawing.Point(4, 22);
             this.tabPageList.Margin = new System.Windows.Forms.Padding(2);
             this.tabPageList.Name = "tabPageList";
@@ -97,6 +99,17 @@
             this.tabPageList.TabIndex = 0;
             this.tabPageList.Text = "Список продуктов";
             this.tabPageList.UseVisualStyleBackColor = true;
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(190, 530);
+            this.button5.Margin = new System.Windows.Forms.Padding(2);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(175, 36);
+            this.button5.TabIndex = 18;
+            this.button5.Text = "Изменить продукт";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // tabPageAdd
             // 
@@ -108,6 +121,8 @@
             this.tabPageAdd.Controls.Add(this.label3);
             this.tabPageAdd.Controls.Add(this.textBox2);
             this.tabPageAdd.Controls.Add(this.button1);
+            this.tabPageAdd.Controls.Add(this.button4);
+            this.tabPageAdd.Controls.Add(this.button2);
             this.tabPageAdd.Location = new System.Drawing.Point(4, 22);
             this.tabPageAdd.Margin = new System.Windows.Forms.Padding(2);
             this.tabPageAdd.Name = "tabPageAdd";
@@ -116,6 +131,17 @@
             this.tabPageAdd.TabIndex = 1;
             this.tabPageAdd.Text = "Добавить продукт";
             this.tabPageAdd.UseVisualStyleBackColor = true;
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(124, 262);
+            this.button4.Margin = new System.Windows.Forms.Padding(2);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(175, 36);
+            this.button4.TabIndex = 17;
+            this.button4.Text = "Изменить продукт";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // textBox1
             // 
@@ -265,6 +291,8 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPageList;
         private System.Windows.Forms.TabPage tabPageAdd;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;

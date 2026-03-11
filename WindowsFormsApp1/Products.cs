@@ -13,6 +13,8 @@ namespace WindowsFormsApp1
 {
     public partial class Products : Form
     {
+        private int selectedProductId = 0;
+
         public Products()
         {
             InitializeComponent();
@@ -59,6 +61,8 @@ namespace WindowsFormsApp1
                 dataGridView1.AllowUserToAddRows = false;
                 dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
                 dataGridView1.MultiSelect = false;
+                dataGridView1.CellClick -= dataGridView1_CellClick;
+                dataGridView1.CellClick += dataGridView1_CellClick;
 
                 db.openConnection();
                 SqlCommand command = new SqlCommand("SELECT Products.ID_product, Products.Name_of_prod, Unit.Unit, Products.Cost FROM Products JOIN Unit ON Products.ID_unit = Unit.ID_unit", db.getConnection());
@@ -137,6 +141,103 @@ namespace WindowsFormsApp1
             }
 
             LoadProductsGrid();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (selectedProductId == 0)
+            {
+                MessageBox.Show("Выберите продукт в таблице");
+                return;
+            }
+
+            string name = textBox1.Text.Trim();
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                MessageBox.Show("Введите наименование");
+                return;
+            }
+            if (comboBox1.SelectedValue == null)
+            {
+                MessageBox.Show("Выберите единицу измерения");
+                return;
+            }
+            if (!decimal.TryParse(textBox2.Text, out decimal cost) || cost < 0)
+            {
+                MessageBox.Show("Введите корректную цену");
+                return;
+            }
+
+            int unitId = Convert.ToInt32(comboBox1.SelectedValue);
+
+            DB db = new DB();
+            try
+            {
+                db.openConnection();
+                SqlCommand check = new SqlCommand("SELECT COUNT(*) FROM Products WHERE Name_of_prod=@name AND ID_product<>@id", db.getConnection());
+                check.Parameters.Add("@name", SqlDbType.NVarChar).Value = name;
+                check.Parameters.Add("@id", SqlDbType.Int).Value = selectedProductId;
+                int exists = Convert.ToInt32(check.ExecuteScalar());
+                if (exists > 0)
+                {
+                    MessageBox.Show("Продукт с таким названием уже есть");
+                    return;
+                }
+
+                SqlCommand cmd = new SqlCommand("UPDATE Products SET Name_of_prod=@name, ID_unit=@unit, Cost=@cost WHERE ID_product=@id", db.getConnection());
+                cmd.Parameters.Add("@name", SqlDbType.NVarChar).Value = name;
+                cmd.Parameters.Add("@unit", SqlDbType.Int).Value = unitId;
+                var pCost = cmd.Parameters.Add("@cost", SqlDbType.Decimal);
+                pCost.Precision = 18;
+                pCost.Scale = 2;
+                pCost.Value = cost;
+                cmd.Parameters.Add("@id", SqlDbType.Int).Value = selectedProductId;
+
+                if (cmd.ExecuteNonQuery() == 1)
+                    MessageBox.Show("Продукт изменен");
+                else
+                    MessageBox.Show("Ошибка обновления");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                db.closeConnection();
+            }
+
+            LoadProductsGrid();
+        }
+
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+            SelectProductFromRow(row);
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentRow == null || dataGridView1.CurrentRow.IsNewRow)
+            {
+                MessageBox.Show("Выберите продукт");
+                return;
+            }
+            SelectProductFromRow(dataGridView1.CurrentRow);
+        }
+
+        private void SelectProductFromRow(DataGridViewRow row)
+        {
+            if (row == null || row.IsNewRow) return;
+            if (row.Cells[0].Value == null) return;
+            if (!int.TryParse(row.Cells[0].Value.ToString(), out int id)) return;
+
+            selectedProductId = id;
+            textBox1.Text = row.Cells[1].Value?.ToString();
+            comboBox1.Text = row.Cells[2].Value?.ToString();
+            textBox2.Text = row.Cells[3].Value?.ToString();
+            tabControl1.SelectedTab = tabPageAdd;
         }
 
 
