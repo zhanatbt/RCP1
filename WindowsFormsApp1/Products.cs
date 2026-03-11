@@ -57,6 +57,8 @@ namespace WindowsFormsApp1
                 dataGridView1.Rows.Clear();
                 dataGridView1.ReadOnly = true;
                 dataGridView1.AllowUserToAddRows = false;
+                dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+                dataGridView1.MultiSelect = false;
 
                 db.openConnection();
                 SqlCommand command = new SqlCommand("SELECT Products.ID_product, Products.Name_of_prod, Unit.Unit, Products.Cost FROM Products JOIN Unit ON Products.ID_unit = Unit.ID_unit", db.getConnection());
@@ -92,6 +94,62 @@ namespace WindowsFormsApp1
             this.Close();
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentRow == null || dataGridView1.CurrentRow.IsNewRow)
+            {
+                MessageBox.Show("Выберите продукт");
+                return;
+            }
+
+            object idObj = dataGridView1.CurrentRow.Cells[0].Value;
+            int id;
+            if (idObj == null || !int.TryParse(idObj.ToString(), out id))
+            {
+                MessageBox.Show("Неверный идентификатор продукта");
+                return;
+            }
+
+            DB db = new DB();
+            try
+            {
+                db.openConnection();
+                if (IsProductUsed(db, id))
+                {
+                    MessageBox.Show("Нельзя удалить: продукт используется в блюдах");
+                    return;
+                }
+                SqlCommand cmd = new SqlCommand("DELETE FROM Products WHERE ID_product=@id", db.getConnection());
+                cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                int rows = cmd.ExecuteNonQuery();
+                if (rows >= 1)
+                    MessageBox.Show("Продукт удален");
+                else
+                    MessageBox.Show("Продукт не найден");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                db.closeConnection();
+            }
+
+            LoadProductsGrid();
+        }
+
+
+        private bool IsProductUsed(DB db, int id)
+        {
+            SqlCommand check = new SqlCommand("SELECT COUNT(*) FROM Calculation WHERE ID_product=@id", db.getConnection());
+            check.Parameters.Add("@id", SqlDbType.Int).Value = id;
+            object res = check.ExecuteScalar();
+            int count = (res == null || res == DBNull.Value) ? 0 : Convert.ToInt32(res);
+            return count > 0;
+        }
+
+
         private void comboBox1_MouseHover(object sender, EventArgs e)
         {
             LoadUnitsCombo();
@@ -101,11 +159,21 @@ namespace WindowsFormsApp1
         {
             try
             {
-                decimal cost = Convert.ToDecimal(textBox2.Text);
-                string name = textBox1.Text;
+                string name = textBox1.Text.Trim();
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    MessageBox.Show("Введите наименование");
+                    return;
+                }
                 if (comboBox1.SelectedValue == null)
                 {
                     MessageBox.Show("Выберите единицу измерения");
+                    return;
+                }
+                decimal cost;
+                if (!decimal.TryParse(textBox2.Text, out cost) || cost < 0)
+                {
+                    MessageBox.Show("Введите корректную цену");
                     return;
                 }
                 int unitId = Convert.ToInt32(comboBox1.SelectedValue);

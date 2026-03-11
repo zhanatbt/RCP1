@@ -13,9 +13,6 @@ namespace WindowsFormsApp1
             Color surface = Color.White;
             Color text = Color.FromArgb(45, 55, 72);
             Color border = Color.FromArgb(229, 231, 235);
-            Color btnPrimary = Color.FromArgb(221, 235, 255);
-            Color btnNav = Color.FromArgb(236, 238, 240);
-
             if (root is Form f)
             {
                 f.BackColor = bg;
@@ -44,13 +41,9 @@ namespace WindowsFormsApp1
                 }
                 else if (c is Button btn)
                 {
-                    btn.FlatStyle = FlatStyle.Flat;
-                    btn.FlatAppearance.BorderSize = 0;
-                    btn.ForeColor = text;
-                    if (btn.Parent != null && btn.Parent.Name.ToLower().Contains("sidebar"))
-                        btn.BackColor = btnNav;
-                    else
-                        btn.BackColor = btnPrimary;
+                    btn.FlatStyle = FlatStyle.Standard;
+                    btn.UseVisualStyleBackColor = true;
+                    btn.ForeColor = Color.Black;
                 }
                 else if (c is DataGridView dgv)
                 {
