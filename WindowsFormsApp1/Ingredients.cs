@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,8 +27,10 @@ namespace WindowsFormsApp1
 
         private void Ingredients_Load(object sender, EventArgs e)
         {
+            EnsureAmountColumnSupportsKg();
             LoadDishesCombo();
             LoadProductsCombo();
+            labelDishCost.Text = "0.00";
         }
 
         private void LoadDishesCombo()
@@ -136,16 +139,16 @@ namespace WindowsFormsApp1
             {
                 dataGridView1.Rows.Add(s);
             }
+            UpdateDishCostLabel(id_dish);
         }
 
         //кнопка добавить
 
         private void button2_Click(object sender, EventArgs e)
         {
-            int amount = 0;
-
-            if (string.IsNullOrWhiteSpace(textBox1.Text) || !int.TryParse(textBox1.Text, out amount) || amount < 0)
-                MessageBox.Show("Введено отрицательное значение");
+            decimal amount = 0m;
+            if (!TryParseAmount(textBox1.Text, out amount) || amount <= 0)
+                MessageBox.Show("Введите корректное количество (можно в кг, например 0.35)");
             else
             {
                 int id_dish = 0;
@@ -205,7 +208,10 @@ namespace WindowsFormsApp1
                     cmd = new SqlCommand("INSERT INTO Calculation (ID_dish,ID_product,Amount) VALUES (@id_dish , @id_product , @amount)", db.getConnection());
                     cmd.Parameters.Add("@id_dish", SqlDbType.Int).Value = id_dish;
                     cmd.Parameters.Add("@id_product", SqlDbType.Int).Value = id_prod;
-                    cmd.Parameters.Add("@amount", SqlDbType.Int).Value = amount;
+                    SqlParameter amountParam = cmd.Parameters.Add("@amount", SqlDbType.Decimal);
+                    amountParam.Precision = 18;
+                    amountParam.Scale = 3;
+                    amountParam.Value = amount;
                     if (cmd.ExecuteNonQuery() == 1)
                         MessageBox.Show("Добавлено");
                     else
@@ -239,6 +245,7 @@ namespace WindowsFormsApp1
                 {
                     dataGridView1.Rows.Add(s);
                 }
+                UpdateDishCostLabel(id_dish);
 
                 db.closeConnection();
             }
@@ -259,18 +266,11 @@ namespace WindowsFormsApp1
             String prod_name = comboBox3.Text;
             int id_dish = 0;
             int id_prod = 0;
-            int amount = 0;
             string dish_name = comboBox2.Text;
 
             if (string.IsNullOrWhiteSpace(dish_name) || string.IsNullOrWhiteSpace(prod_name))
             {
                 MessageBox.Show("Выберите блюдо и продукт");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(textBox1.Text) || !int.TryParse(textBox1.Text, out amount) || amount < 0)
-            {
-                MessageBox.Show("Введено неверное количество");
                 return;
             }
 
@@ -340,6 +340,7 @@ namespace WindowsFormsApp1
             {
                 dataGridView1.Rows.Add(s);
             }
+            UpdateDishCostLabel(id_dish);
 
             db.closeConnection();
         }
@@ -348,9 +349,9 @@ namespace WindowsFormsApp1
 
         private void button4_Click(object sender, EventArgs e)
         {
-            int amount = 0;
-            if (string.IsNullOrWhiteSpace(textBox1.Text) || !int.TryParse(textBox1.Text, out amount) || amount < 0)
-                MessageBox.Show("Введено отрицательное значение");
+            decimal amount = 0m;
+            if (!TryParseAmount(textBox1.Text, out amount) || amount <= 0)
+                MessageBox.Show("Введите корректное количество (можно в кг, например 0.35)");
             else
             {
                 String prod_name = comboBox3.Text;
@@ -404,7 +405,10 @@ namespace WindowsFormsApp1
 
                 SqlCommand command = new SqlCommand("UPDATE Calculation SET ID_product=@prod,Amount=@amount WHERE ID_Dish=@id_dish AND ID_product=@old_prod", db.getConnection());
                 command.Parameters.Add("@prod", SqlDbType.Int).Value = id_ing;
-                command.Parameters.Add("@amount", SqlDbType.Int).Value = amount;
+                SqlParameter amountParam = command.Parameters.Add("@amount", SqlDbType.Decimal);
+                amountParam.Precision = 18;
+                amountParam.Scale = 3;
+                amountParam.Value = amount;
                 command.Parameters.Add("@id_dish", SqlDbType.Int).Value = id_dish;
                 command.Parameters.Add("@old_prod", SqlDbType.Int).Value = selectedProductId;
 
@@ -441,6 +445,7 @@ namespace WindowsFormsApp1
                 {
                     dataGridView1.Rows.Add(s);
                 }
+                UpdateDishCostLabel(id_dish);
 
                 db.closeConnection();
             }
@@ -538,6 +543,7 @@ namespace WindowsFormsApp1
                 {
                     dataGridView1.Rows.Add(s);
                 }
+                UpdateDishCostLabel(id_dish);
 
                 db.closeConnection();
             }
@@ -571,6 +577,76 @@ namespace WindowsFormsApp1
         private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private bool TryParseAmount(string raw, out decimal amount)
+        {
+            amount = 0m;
+            if (string.IsNullOrWhiteSpace(raw))
+                return false;
+
+            string normalized = raw.Trim().Replace(',', '.');
+            return decimal.TryParse(normalized, NumberStyles.Number, CultureInfo.InvariantCulture, out amount);
+        }
+
+        private void EnsureAmountColumnSupportsKg()
+        {
+            DB db = new DB();
+            try
+            {
+                db.openConnection();
+                SqlCommand checkCmd = new SqlCommand(
+                    "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='Calculation' AND COLUMN_NAME='Amount'",
+                    db.getConnection());
+                object typeObj = checkCmd.ExecuteScalar();
+                string dataType = (typeObj == null || typeObj == DBNull.Value) ? string.Empty : typeObj.ToString();
+
+                if (string.Equals(dataType, "int", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(dataType, "smallint", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(dataType, "tinyint", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(dataType, "bigint", StringComparison.OrdinalIgnoreCase))
+                {
+                    SqlCommand alterCmd = new SqlCommand(
+                        "ALTER TABLE Calculation ALTER COLUMN Amount decimal(18,3) NOT NULL",
+                        db.getConnection());
+                    alterCmd.ExecuteNonQuery();
+                }
+            }
+            catch
+            {
+                // If schema migration is not allowed in this environment, app keeps existing behavior.
+            }
+            finally
+            {
+                db.closeConnection();
+            }
+        }
+
+        private void UpdateDishCostLabel(int dishId)
+        {
+            DB db = new DB();
+            try
+            {
+                db.openConnection();
+                SqlCommand command = new SqlCommand(
+                    "SELECT ISNULL(SUM(CAST(Calculation.Amount AS decimal(18,3)) * CAST(Products.Cost AS decimal(18,2))), 0) " +
+                    "FROM Calculation INNER JOIN Products ON Calculation.ID_product = Products.ID_product " +
+                    "WHERE Calculation.ID_dish=@id",
+                    db.getConnection());
+                command.Parameters.Add("@id", SqlDbType.Int).Value = dishId;
+
+                object value = command.ExecuteScalar();
+                decimal cost = (value == null || value == DBNull.Value) ? 0m : Convert.ToDecimal(value);
+                labelDishCost.Text = cost.ToString("0.00", CultureInfo.InvariantCulture);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                db.closeConnection();
+            }
         }
     }
     }

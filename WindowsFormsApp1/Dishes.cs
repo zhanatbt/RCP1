@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
@@ -41,6 +42,7 @@ namespace WindowsFormsApp1
             dataGridView1.ReadOnly = true;
             String name_dish = this.data;
             DB db = new DB();
+            MarkupPercent.Text = "30";
 
             LoadTypesCombo();
 
@@ -83,16 +85,17 @@ namespace WindowsFormsApp1
 
         private void button4_Click(object sender, EventArgs e)
         {
-            int cost = 0;
+            if (!TryGetDishPrice(out int cost))
+            {
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(name.Text) || comboBox1.SelectedValue == null)
             {
                 MessageBox.Show("Заполните название и выберите тип");
             }
-            else if (Convert.ToInt32(Cost.Text) < 0)
-                MessageBox.Show("Введено отрицательное значение");
             else
             {
-                cost = Convert.ToInt32(Cost.Text);
                 String name_dish = name.Text;
                 int id_type = Convert.ToInt32(comboBox1.SelectedValue);
 
@@ -290,17 +293,24 @@ namespace WindowsFormsApp1
                 id_type= type_id;
 
                 db.closeConnection();
+                LoadCostPrice(id_dish);
             }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            int cost = 0;
-            if (Convert.ToInt32(Cost.Text) < 0)
-                MessageBox.Show("Введено отрицательное значение");
+            if (!TryGetDishPrice(out int cost))
+            {
+                return;
+            }
+
+            if (id_dish == 0)
+            {
+                MessageBox.Show("Сначала выберите блюдо в таблице");
+                return;
+            }
             else
             {
-                cost = Convert.ToInt32(Cost.Text);
                 String name_dish = name.Text;
                 int id_type= 0;
 
@@ -326,7 +336,7 @@ namespace WindowsFormsApp1
                 command.Parameters.Add("@id", SqlDbType.NVarChar).Value = id_dish;
                 command.Parameters.Add("@name", SqlDbType.NVarChar).Value = name.Text;
                 command.Parameters.Add("@type", SqlDbType.NVarChar).Value = id_type;
-                command.Parameters.Add("@cost", SqlDbType.Int).Value =Convert.ToInt32(Cost.Text);
+                command.Parameters.Add("@cost", SqlDbType.Int).Value = cost;
 
                 if (command.ExecuteNonQuery() == 1)
                     MessageBox.Show("Блюдо changed");
@@ -358,6 +368,84 @@ namespace WindowsFormsApp1
                 {
                     dataGridView1.Rows.Add(s);
                 }
+            }
+        }
+
+        private void MarkupPercent_TextChanged(object sender, EventArgs e)
+        {
+            RecalculatePriceFromCostPrice();
+        }
+
+        private void CostPrice_TextChanged(object sender, EventArgs e)
+        {
+            RecalculatePriceFromCostPrice();
+        }
+
+        private bool TryParseDecimal(string text, out decimal value)
+        {
+            value = 0m;
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
+
+            string normalized = text.Trim().Replace(',', '.');
+            return decimal.TryParse(normalized, NumberStyles.Number, CultureInfo.InvariantCulture, out value);
+        }
+
+        private void RecalculatePriceFromCostPrice()
+        {
+            if (!TryParseDecimal(CostPrice.Text, out decimal costPrice))
+            {
+                Cost.Text = string.Empty;
+                return;
+            }
+
+            if (!TryParseDecimal(MarkupPercent.Text, out decimal markupPercent) || markupPercent < 0)
+            {
+                Cost.Text = string.Empty;
+                return;
+            }
+
+            decimal finalPrice = costPrice + (costPrice * markupPercent / 100m);
+            Cost.Text = Math.Round(finalPrice, 0, MidpointRounding.AwayFromZero).ToString();
+        }
+
+        private bool TryGetDishPrice(out int dishPrice)
+        {
+            dishPrice = 0;
+            if (string.IsNullOrWhiteSpace(Cost.Text) || !int.TryParse(Cost.Text, out dishPrice) || dishPrice < 0)
+            {
+                MessageBox.Show("Проверьте себестоимость и процент наценки");
+                return false;
+            }
+
+            return true;
+        }
+
+        private void LoadCostPrice(int dishId)
+        {
+            DB db = new DB();
+            try
+            {
+                db.openConnection();
+                SqlCommand command = new SqlCommand(
+                    "SELECT ISNULL(SUM(CAST(Calculation.Amount AS decimal(18,3)) * CAST(Products.Cost AS decimal(18,2))), 0) " +
+                    "FROM Calculation INNER JOIN Products ON Calculation.ID_product = Products.ID_product " +
+                    "WHERE Calculation.ID_dish=@id",
+                    db.getConnection());
+                command.Parameters.Add("@id", SqlDbType.Int).Value = dishId;
+
+                object result = command.ExecuteScalar();
+                decimal costPrice = (result == null || result == DBNull.Value) ? 0m : Convert.ToDecimal(result);
+                CostPrice.Text = costPrice.ToString("0.###", CultureInfo.InvariantCulture);
+                RecalculatePriceFromCostPrice();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                db.closeConnection();
             }
         }
     }

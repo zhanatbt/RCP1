@@ -40,6 +40,10 @@ namespace WindowsFormsApp1
             this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.Cost = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.CostPrice = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.MarkupPercent = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
@@ -134,7 +138,7 @@ namespace WindowsFormsApp1
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(484, 253);
+            this.label3.Location = new System.Drawing.Point(484, 360);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(40, 16);
             this.label3.TabIndex = 15;
@@ -142,11 +146,50 @@ namespace WindowsFormsApp1
             // 
             // Cost
             // 
-            this.Cost.Location = new System.Drawing.Point(487, 272);
+            this.Cost.Location = new System.Drawing.Point(487, 379);
             this.Cost.Name = "Cost";
             this.Cost.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.Cost.Size = new System.Drawing.Size(103, 20);
             this.Cost.TabIndex = 14;
+            this.Cost.ReadOnly = true;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label6.Location = new System.Drawing.Point(484, 253);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(102, 16);
+            this.label6.TabIndex = 21;
+            this.label6.Text = "Себестоимость";
+            // 
+            // CostPrice
+            // 
+            this.CostPrice.Location = new System.Drawing.Point(487, 272);
+            this.CostPrice.Name = "CostPrice";
+            this.CostPrice.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.CostPrice.Size = new System.Drawing.Size(103, 20);
+            this.CostPrice.TabIndex = 22;
+            this.CostPrice.TextChanged += new System.EventHandler(this.CostPrice_TextChanged);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label7.Location = new System.Drawing.Point(484, 307);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(105, 16);
+            this.label7.TabIndex = 23;
+            this.label7.Text = "Наценка, %";
+            // 
+            // MarkupPercent
+            // 
+            this.MarkupPercent.Location = new System.Drawing.Point(487, 326);
+            this.MarkupPercent.Name = "MarkupPercent";
+            this.MarkupPercent.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.MarkupPercent.Size = new System.Drawing.Size(103, 20);
+            this.MarkupPercent.TabIndex = 24;
+            this.MarkupPercent.TextChanged += new System.EventHandler(this.MarkupPercent_TextChanged);
             // 
             // button2
             // 
@@ -206,6 +249,10 @@ namespace WindowsFormsApp1
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button2);
+            this.Controls.Add(this.MarkupPercent);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.CostPrice);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.Cost);
             this.Controls.Add(this.comboBox1);
@@ -243,5 +290,9 @@ namespace WindowsFormsApp1
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox CostPrice;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox MarkupPercent;
     }
 }
