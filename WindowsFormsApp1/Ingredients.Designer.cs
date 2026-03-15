@@ -100,9 +100,9 @@ namespace WindowsFormsApp1
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(420, 545);
+            this.button2.Location = new System.Drawing.Point(429, 282);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(162, 40);
+            this.button2.Size = new System.Drawing.Size(86, 34);
             this.button2.TabIndex = 4;
             this.button2.Text = "Добавить ингредиент";
             this.button2.UseVisualStyleBackColor = true;
@@ -174,9 +174,9 @@ namespace WindowsFormsApp1
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(32, 545);
+            this.button4.Location = new System.Drawing.Point(521, 282);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(170, 40);
+            this.button4.Size = new System.Drawing.Size(86, 34);
             this.button4.TabIndex = 18;
             this.button4.Text = "Изменить ингредиент";
             this.button4.UseVisualStyleBackColor = true;
@@ -184,9 +184,9 @@ namespace WindowsFormsApp1
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(225, 545);
+            this.button5.Location = new System.Drawing.Point(613, 282);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(170, 40);
+            this.button5.Size = new System.Drawing.Size(86, 34);
             this.button5.TabIndex = 19;
             this.button5.Text = "Удалить ингредиент";
             this.button5.UseVisualStyleBackColor = true;
@@ -238,9 +238,9 @@ namespace WindowsFormsApp1
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label6.Location = new System.Drawing.Point(460, 280);
+            this.label6.Location = new System.Drawing.Point(460, 341);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(142, 16);
+            this.label6.Size = new System.Drawing.Size(125, 16);
             this.label6.TabIndex = 24;
             this.label6.Text = "Себестоимость:";
             // 
@@ -248,11 +248,12 @@ namespace WindowsFormsApp1
             // 
             this.labelDishCost.AutoSize = true;
             this.labelDishCost.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelDishCost.Location = new System.Drawing.Point(460, 304);
+            this.labelDishCost.Location = new System.Drawing.Point(634, 341);
             this.labelDishCost.Name = "labelDishCost";
-            this.labelDishCost.Size = new System.Drawing.Size(40, 16);
+            this.labelDishCost.Size = new System.Drawing.Size(31, 16);
             this.labelDishCost.TabIndex = 25;
             this.labelDishCost.Text = "0.00";
+            this.labelDishCost.Click += new System.EventHandler(this.labelDishCost_Click);
             // 
             // Ingredients
             // 

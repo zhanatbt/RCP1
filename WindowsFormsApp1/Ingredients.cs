@@ -744,6 +744,11 @@ namespace WindowsFormsApp1
             int count = Convert.ToInt32(check.ExecuteScalar());
             return count > 0;
         }
+
+        private void labelDishCost_Click(object sender, EventArgs e)
+        {
+
+        }
     }
     }
     
