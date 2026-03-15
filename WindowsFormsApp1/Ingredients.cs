@@ -27,12 +27,14 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
             UIStyle.Apply(this);
+            UIStyle.AddRefreshButton(this, () => new Ingredients());
         }
 
         public Ingredients(string dishName, bool autoShow = true) : this()
         {
             initialDishName = dishName;
             autoShowInitialDish = autoShow;
+            UIStyle.AddRefreshButton(this, () => new Ingredients(dishName, autoShow));
         }
 
         private void Ingredients_Load(object sender, EventArgs e)

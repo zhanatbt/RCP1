@@ -13,6 +13,7 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
             UIStyle.Apply(this);
+            UIStyle.AddRefreshButton(this, () => new Dashboard());
         }
 
         private void Dashboard_Load(object sender, EventArgs e)

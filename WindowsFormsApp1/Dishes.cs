@@ -24,12 +24,14 @@ namespace WindowsFormsApp1
             InitializeComponent();
             UIStyle.Apply(this);
             this.data = data;
+            UIStyle.AddRefreshButton(this, () => new Dishes(data));
         }
 
         public Dishes()
         {
             InitializeComponent();
             UIStyle.Apply(this);
+            UIStyle.AddRefreshButton(this, () => new Dishes());
         }
 
 

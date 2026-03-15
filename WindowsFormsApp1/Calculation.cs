@@ -17,6 +17,7 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
             UIStyle.Apply(this);
+            UIStyle.AddRefreshButton(this, () => new Calculation());
         }
 
         private void button1_Click(object sender, EventArgs e)

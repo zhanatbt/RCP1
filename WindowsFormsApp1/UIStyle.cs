@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Windows.Forms;
+using System;
 
 namespace WindowsFormsApp1
 {
@@ -69,6 +70,95 @@ namespace WindowsFormsApp1
                 if (c.HasChildren)
                     Apply(c);
             }
+        }
+
+        public static void AddRefreshButton(Form form, Func<Form> refreshFactory = null)
+        {
+            if (form == null) return;
+
+            const string refreshButtonName = "buttonRefreshPage";
+            Button button = form.Controls[refreshButtonName] as Button;
+            if (button == null)
+            {
+                button = new Button();
+                button.Name = refreshButtonName;
+                button.Text = "Обновить";
+                button.Size = new Size(90, 28);
+                button.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+                button.Location = new Point(Math.Max(10, form.ClientSize.Width - button.Width - 10), 10);
+                button.Click += RefreshButton_Click;
+                form.Controls.Add(button);
+                button.BringToFront();
+            }
+
+            button.Tag = refreshFactory;
+        }
+
+        private static void RefreshButton_Click(object sender, EventArgs e)
+        {
+            Button button = sender as Button;
+            if (button == null) return;
+
+            Form current = button.FindForm();
+            if (current == null) return;
+
+            Func<Form> factory = button.Tag as Func<Form>;
+            if (factory == null)
+            {
+                try
+                {
+                    factory = () => (Form)Activator.CreateInstance(current.GetType());
+                }
+                catch
+                {
+                    MessageBox.Show("Не удалось обновить форму");
+                    return;
+                }
+            }
+
+            Form refreshed;
+            try
+            {
+                refreshed = factory();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+
+            Main host = FindMainHost(current);
+            if (host != null && !current.TopLevel)
+            {
+                host.OpenChildForm(refreshed);
+                return;
+            }
+
+            if (current.Owner != null)
+            {
+                refreshed.StartPosition = current.StartPosition;
+                refreshed.Show(current.Owner);
+                current.Close();
+                return;
+            }
+
+            refreshed.StartPosition = current.StartPosition;
+            refreshed.Show();
+            current.Close();
+        }
+
+        private static Main FindMainHost(Control control)
+        {
+            Control current = control;
+            while (current != null)
+            {
+                if (current is Main main)
+                    return main;
+
+                current = current.Parent;
+            }
+
+            return null;
         }
     }
 }

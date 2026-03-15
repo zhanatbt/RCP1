@@ -19,6 +19,7 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
             UIStyle.Apply(this);
+            UIStyle.AddRefreshButton(this, () => new Products());
         }
 
         private void Products_Load(object sender, EventArgs e)

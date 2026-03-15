@@ -18,6 +18,7 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
             UIStyle.Apply(this);
+            UIStyle.AddRefreshButton(this, () => new Orders());
         }
 
         private void Orders_Load(object sender, EventArgs e)
