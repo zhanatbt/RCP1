@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,8 @@ namespace WindowsFormsApp1
             InitializeComponent();
             UIStyle.Apply(this);
             UIStyle.AddRefreshButton(this, () => new Report());
+            dateTimePicker1.Format = DateTimePickerFormat.Short;
+            dateTimePicker2.Format = DateTimePickerFormat.Short;
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -65,6 +68,35 @@ namespace WindowsFormsApp1
             {
                 dataGridView1.Rows.Add(s);
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.Rows.Count == 0)
+            {
+                MessageBox.Show("Сначала сформируйте отчет");
+                return;
+            }
+
+            SaveFileDialog save = new SaveFileDialog();
+            save.Filter = "Excel CSV (*.csv)|*.csv";
+            save.FileName = "orders_report_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv";
+            if (save.ShowDialog() != DialogResult.OK)
+                return;
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Дата;Сумма");
+
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                if (row.IsNewRow) continue;
+                string date = row.Cells[0].Value?.ToString() ?? string.Empty;
+                string sum = row.Cells[1].Value?.ToString() ?? string.Empty;
+                sb.AppendLine(date.Replace(";", ",") + ";" + sum.Replace(";", ","));
+            }
+
+            File.WriteAllText(save.FileName, sb.ToString(), Encoding.UTF8);
+            MessageBox.Show("Экспортировано в Excel-файл:\n" + save.FileName);
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
