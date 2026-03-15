@@ -20,11 +20,19 @@ namespace WindowsFormsApp1
         int selectedProductId = 0;
         private bool markupColumnReady = false;
         private bool markupWarned = false;
+        private readonly string initialDishName;
+        private readonly bool autoShowInitialDish;
 
         public Ingredients()
         {
             InitializeComponent();
             UIStyle.Apply(this);
+        }
+
+        public Ingredients(string dishName, bool autoShow = true) : this()
+        {
+            initialDishName = dishName;
+            autoShowInitialDish = autoShow;
         }
 
         private void Ingredients_Load(object sender, EventArgs e)
@@ -34,6 +42,13 @@ namespace WindowsFormsApp1
             LoadDishesCombo();
             LoadProductsCombo();
             labelDishCost.Text = "0.00";
+
+            if (!string.IsNullOrWhiteSpace(initialDishName))
+            {
+                comboBox2.Text = initialDishName;
+                if (autoShowInitialDish)
+                    ShowDishIngredients();
+            }
         }
 
         private void LoadDishesCombo()
@@ -86,6 +101,11 @@ namespace WindowsFormsApp1
         //кнопка выбрать
 
         private void button1_Click(object sender, EventArgs e)
+        {
+            ShowDishIngredients();
+        }
+
+        private void ShowDishIngredients()
         {
             dataGridView1.ReadOnly = true;
             dataGridView1.Rows.Clear();

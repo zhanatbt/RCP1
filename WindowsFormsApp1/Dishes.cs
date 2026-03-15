@@ -73,6 +73,15 @@ namespace WindowsFormsApp1
                 {
                     dataGridView1.Rows.Add(s);
                 }
+
+                if (string.Equals(data, "add", StringComparison.OrdinalIgnoreCase))
+                {
+                    name.Clear();
+                    CostPrice.Clear();
+                    Cost.Clear();
+                    MarkupPercent.Text = "30";
+                    name.Focus();
+                }
             }
             catch (Exception ex)
             {
@@ -138,7 +147,12 @@ namespace WindowsFormsApp1
                     db.openConnection();
 
                     if (command.ExecuteNonQuery() == 1)
-                        MessageBox.Show("Блюдо добавлено");
+                    {
+                        MessageBox.Show("Блюдо создано с ценой 0. Теперь добавьте ингредиенты.");
+                        db.closeConnection();
+                        OpenIngredientsForDish(name_dish);
+                        return;
+                    }
                     else
                         MessageBox.Show("Error...");
 
@@ -174,6 +188,70 @@ namespace WindowsFormsApp1
                     dataGridView1.Rows.Add(s);
                 }
             }
+        }
+
+        private void OpenIngredientsForDish(string dishName)
+        {
+            Main host = this.FindForm() as Main;
+            Ingredients ingredients = new Ingredients(dishName, true);
+            ingredients.StartPosition = FormStartPosition.CenterParent;
+            ingredients.FormClosed += (s, e) =>
+            {
+                RefreshDishesGrid();
+                LoadDishByName(dishName);
+            };
+
+            if (host != null)
+            {
+                ingredients.Show(host);
+                ingredients.BringToFront();
+                ingredients.Activate();
+                return;
+            }
+
+            ingredients.Show();
+            ingredients.BringToFront();
+            ingredients.Activate();
+        }
+
+        private void LoadDishByName(string dishName)
+        {
+            if (string.IsNullOrWhiteSpace(dishName))
+                return;
+
+            DB db = new DB();
+            try
+            {
+                db.openConnection();
+                SqlCommand command = new SqlCommand(
+                    "SELECT TOP 1 d.ID_dish, d.Cost, ISNULL(t.TypeOfDish,''), ISNULL(d.MarkupPercent,30) " +
+                    "FROM Dishes d LEFT JOIN Type_of_Dishes t ON d.Type_of_dish=t.Type_of_d " +
+                    "WHERE d.Name_of_dish=@name",
+                    db.getConnection());
+                command.Parameters.Add("@name", SqlDbType.NVarChar).Value = dishName;
+
+                SqlDataReader reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    id_dish = Convert.ToInt32(reader[0]);
+                    name.Text = dishName;
+                    Cost.Text = reader[1].ToString();
+                    comboBox1.Text = reader[2].ToString();
+                    MarkupPercent.Text = Convert.ToDecimal(reader[3]).ToString("0.##", CultureInfo.InvariantCulture);
+                }
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                db.closeConnection();
+            }
+
+            if (id_dish > 0)
+                LoadCostPrice(id_dish);
         }
 
         private void comboBox1_MouseHover(object sender, EventArgs e)

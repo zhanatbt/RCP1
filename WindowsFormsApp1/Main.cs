@@ -78,5 +78,10 @@ namespace WindowsFormsApp1
         {
             OpenChildForm(new Dashboard());
         }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new Dishes("add"));
+        }
     }
 }
