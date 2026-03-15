@@ -149,11 +149,11 @@ namespace WindowsFormsApp1
             this.button8.FlatAppearance.BorderSize = 0;
             this.button8.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button8.ForeColor = System.Drawing.Color.White;
-            this.button8.Location = new System.Drawing.Point(9, 167);
+            this.button8.Location = new System.Drawing.Point(9, 202);
             this.button8.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(131, 29);
-            this.button8.TabIndex = 2;
+            this.button8.TabIndex = 3;
             this.button8.Text = "Продукты";
             this.button8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button8.UseVisualStyleBackColor = true;
@@ -164,11 +164,11 @@ namespace WindowsFormsApp1
             this.button2.FlatAppearance.BorderSize = 0;
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button2.ForeColor = System.Drawing.Color.White;
-            this.button2.Location = new System.Drawing.Point(9, 202);
+            this.button2.Location = new System.Drawing.Point(9, 167);
             this.button2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(131, 29);
-            this.button2.TabIndex = 3;
+            this.button2.TabIndex = 2;
             this.button2.Text = "Ингредиенты";
             this.button2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.button2.UseVisualStyleBackColor = true;
