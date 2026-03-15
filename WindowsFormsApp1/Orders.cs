@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -370,6 +371,7 @@ namespace WindowsFormsApp1
             int Sum = 0;
             string s = "";
             int ord_id = 0;
+            DateTime checkDate = DateTime.Now;
 
             DB db = new DB();
 
@@ -408,6 +410,14 @@ namespace WindowsFormsApp1
             }
             reader2.Close();
 
+            List<ClientCheckLine> clientLines = LoadClientCheckLines(db, ord_id);
+            if (clientLines.Count == 0)
+            {
+                MessageBox.Show("В заказе нет блюд для печати чека");
+                db.closeConnection();
+                return;
+            }
+
 
 
             cmd = new SqlCommand("INSERT INTO Check_Form(Date_of_order,ID_order,Summ) VALUES (GETDATE(),@id_o,@sum)", db.getConnection());
@@ -417,7 +427,9 @@ namespace WindowsFormsApp1
 
             if (cmd.ExecuteNonQuery() >= 1)
             {
-                MessageBox.Show(s);
+                string clientCheck = BuildClientCheckText(ord_id, clientLines, Sum, checkDate);
+                string savedPath = SaveClientCheckToTxt(ord_id, checkDate, clientCheck);
+                MessageBox.Show(s + "\n\nКлиентский чек сохранен:\n" + savedPath);
             }
             else
                 MessageBox.Show("Error...");
@@ -655,6 +667,75 @@ namespace WindowsFormsApp1
             comboBox2.BackColor = string.IsNullOrWhiteSpace(comboBox2.Text)
                 ? SystemColors.Window
                 : Color.LemonChiffon;
+        }
+
+        private List<ClientCheckLine> LoadClientCheckLines(DB db, int orderId)
+        {
+            List<ClientCheckLine> lines = new List<ClientCheckLine>();
+            SqlCommand command = new SqlCommand(
+                "SELECT d.Name_of_dish, o.Amount, o.Cost " +
+                "FROM Orders o " +
+                "INNER JOIN Dishes d ON o.ID_dish=d.ID_dish " +
+                "WHERE o.ID_order=@id AND CAST(o.Date_of_order AS DATE)=CAST(GETDATE() AS DATE) " +
+                "ORDER BY d.Name_of_dish",
+                db.getConnection());
+            command.Parameters.Add("@id", SqlDbType.Int).Value = orderId;
+
+            SqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                string dishName = reader[0].ToString();
+                int amount = Convert.ToInt32(reader[1]);
+                int price = Convert.ToInt32(reader[2]);
+                lines.Add(new ClientCheckLine
+                {
+                    DishName = dishName,
+                    Amount = amount,
+                    Price = price
+                });
+            }
+            reader.Close();
+            return lines;
+        }
+
+        private string BuildClientCheckText(int orderId, List<ClientCheckLine> lines, int total, DateTime checkDate)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine("КАФЕ - КЛИЕНТСКИЙ ЧЕК");
+            builder.AppendLine("Заказ №" + orderId);
+            builder.AppendLine("Дата: " + checkDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            builder.AppendLine(new string('-', 42));
+            builder.AppendLine("Блюдо | Кол-во | Цена | Сумма");
+
+            foreach (ClientCheckLine line in lines)
+            {
+                int lineTotal = line.Amount * line.Price;
+                builder.AppendLine(line.DishName + " | " + line.Amount + " | " + line.Price + " | " + lineTotal);
+            }
+
+            builder.AppendLine(new string('-', 42));
+            builder.AppendLine("ИТОГО: " + total);
+            return builder.ToString();
+        }
+
+        private string SaveClientCheckToTxt(int orderId, DateTime checkDate, string content)
+        {
+            string checksFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                "CafeChecks");
+            Directory.CreateDirectory(checksFolder);
+
+            string fileName = "client_check_order_" + orderId + "_" + checkDate.ToString("yyyyMMdd_HHmmss") + ".txt";
+            string fullPath = Path.Combine(checksFolder, fileName);
+            File.WriteAllText(fullPath, content, Encoding.UTF8);
+            return fullPath;
+        }
+
+        private class ClientCheckLine
+        {
+            public string DishName { get; set; }
+            public int Amount { get; set; }
+            public int Price { get; set; }
         }
     }
 }
