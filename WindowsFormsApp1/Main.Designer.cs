@@ -42,6 +42,7 @@ namespace WindowsFormsApp1
             this.button4 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
+            this.button10 = new System.Windows.Forms.Button();
             this.panelMain = new System.Windows.Forms.Panel();
             this.panelHeader.SuspendLayout();
             this.panelSidebar.SuspendLayout();
@@ -94,6 +95,7 @@ namespace WindowsFormsApp1
             this.panelSidebar.Controls.Add(this.button4);
             this.panelSidebar.Controls.Add(this.button6);
             this.panelSidebar.Controls.Add(this.button9);
+            this.panelSidebar.Controls.Add(this.button10);
             this.panelSidebar.Dock = System.Windows.Forms.DockStyle.Left;
             this.panelSidebar.Location = new System.Drawing.Point(0, 0);
             this.panelSidebar.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
@@ -236,6 +238,21 @@ namespace WindowsFormsApp1
             this.button9.UseVisualStyleBackColor = true;
             this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
+            // button10
+            // 
+            this.button10.FlatAppearance.BorderSize = 0;
+            this.button10.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button10.ForeColor = System.Drawing.Color.White;
+            this.button10.Location = new System.Drawing.Point(9, 372);
+            this.button10.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(131, 29);
+            this.button10.TabIndex = 8;
+            this.button10.Text = "Типы блюд";
+            this.button10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button10.UseVisualStyleBackColor = true;
+            this.button10.Click += new System.EventHandler(this.button10_Click);
+            // 
             // panelMain
             // 
             this.panelMain.BackColor = System.Drawing.Color.White;
@@ -278,6 +295,7 @@ namespace WindowsFormsApp1
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Button button10;
         private System.Windows.Forms.Panel panelMain;
     }
 }

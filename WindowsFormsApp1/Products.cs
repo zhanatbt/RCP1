@@ -66,7 +66,7 @@ namespace WindowsFormsApp1
                 dataGridView1.CellClick += dataGridView1_CellClick;
 
                 db.openConnection();
-                SqlCommand command = new SqlCommand("SELECT Products.ID_product, Products.Name_of_prod, Unit.Unit, Products.Cost FROM Products JOIN Unit ON Products.ID_unit = Unit.ID_unit", db.getConnection());
+                SqlCommand command = new SqlCommand("SELECT Products.ID_product, Products.Name_of_prod, Unit.Unit, Products.Cost FROM Products JOIN Unit ON Products.ID_unit = Unit.ID_unit ORDER BY Products.Name_of_prod ASC", db.getConnection());
                 SqlDataReader reader = command.ExecuteReader();
 
                 List<string[]> list = new List<string[]>();

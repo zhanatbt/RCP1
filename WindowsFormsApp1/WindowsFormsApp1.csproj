@@ -58,6 +58,9 @@
     <Compile Include="Dashboard.Designer.cs">
       <DependentUpon>Dashboard.cs</DependentUpon>
     </Compile>
+    <Compile Include="DishTypes.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="DB.cs" />
     <Compile Include="Ingredients.cs">
       <SubType>Form</SubType>

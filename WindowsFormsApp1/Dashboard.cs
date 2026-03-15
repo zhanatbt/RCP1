@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -9,11 +9,15 @@ namespace WindowsFormsApp1
 {
     public partial class Dashboard : Form
     {
+        private Label lblPopularDishType;
+
         public Dashboard()
         {
             InitializeComponent();
             UIStyle.Apply(this);
             UIStyle.AddRefreshButton(this, () => new Dashboard());
+            ApplyReadableText();
+            EnsurePopularTypeLabel();
         }
 
         private void Dashboard_Load(object sender, EventArgs e)
@@ -63,11 +67,13 @@ namespace WindowsFormsApp1
 
                 object totalDishesObj = cmdTotalDishes.ExecuteScalar();
                 int totalDishes = (totalDishesObj == DBNull.Value || totalDishesObj == null) ? 0 : Convert.ToInt32(totalDishesObj);
+                string popularType = GetMostPopularDishTypeForCurrentMonth(db);
 
                 lblTodayOrders.Text = "Сегодня заказов: " + todayOrders.ToString();
                 lblActiveOrders.Text = "Активные заказы: " + activeOrders.ToString();
                 lblRevenueToday.Text = "Выручка сегодня: " + revenue.ToString("0.##");
                 lblTotalDishes.Text = "Всего блюд: " + totalDishes.ToString();
+                lblPopularDishType.Text = "Самый популярный тип блюда (месяц): " + popularType;
 
                 lblTodayOrdersValue.Visible = false;
                 lblActiveOrdersValue.Visible = false;
@@ -84,6 +90,66 @@ namespace WindowsFormsApp1
             }
         }
 
+        private void EnsurePopularTypeLabel()
+        {
+            if (lblPopularDishType != null)
+                return;
+
+            lblPopularDishType = new Label();
+            lblPopularDishType.Name = "lblPopularDishType";
+            lblPopularDishType.AutoSize = true;
+            lblPopularDishType.Location = new Point(10, 70);
+            lblPopularDishType.Text = "Самый популярный тип блюда (месяц): -";
+            groupStats.Controls.Add(lblPopularDishType);
+            lblPopularDishType.BringToFront();
+        }
+
+        private void ApplyReadableText()
+        {
+            groupStats.Text = "Статистика";
+            groupActions.Text = "Быстрые действия";
+            groupRecent.Text = "Последние оплаченные заказы";
+            groupPopular.Text = "Популярные блюда";
+
+            btnCreateOrder.Text = "Создать заказ";
+            btnAddDish.Text = "Добавить блюдо";
+            btnAddProduct.Text = "Добавить продукт";
+            btnTodayReport.Text = "Отчет за сегодня";
+
+            colOrder.HeaderText = "№ заказа";
+            colDate.HeaderText = "Дата";
+            colSum.HeaderText = "Сумма";
+            colDish.HeaderText = "Блюдо";
+            colSales.HeaderText = "Продажи";
+
+            lblTodayOrders.Text = "Сегодня заказов: 0";
+            lblActiveOrders.Text = "Активные заказы: 0";
+            lblRevenueToday.Text = "Выручка сегодня: 0";
+            lblTotalDishes.Text = "Всего блюд: 0";
+        }
+
+        private string GetMostPopularDishTypeForCurrentMonth(DB db)
+        {
+            SqlCommand cmd = new SqlCommand(
+                "SELECT TOP 1 ISNULL(t.TypeOfDish, 'Без типа') AS DishType " +
+                "FROM Orders o " +
+                "INNER JOIN Dishes d ON o.ID_dish = d.ID_dish " +
+                "LEFT JOIN Type_of_Dishes t ON d.Type_of_dish = t.Type_of_d " +
+                "WHERE YEAR(o.Date_of_order)=YEAR(GETDATE()) AND MONTH(o.Date_of_order)=MONTH(GETDATE()) " +
+                "GROUP BY ISNULL(t.TypeOfDish, 'Без типа') " +
+                "ORDER BY SUM(o.Amount) DESC, DishType ASC",
+                db.getConnection());
+
+            object result = cmd.ExecuteScalar();
+            if (result == null || result == DBNull.Value)
+                return "нет данных";
+
+            string typeName = result.ToString();
+            if (string.IsNullOrWhiteSpace(typeName))
+                return "нет данных";
+
+            return typeName;
+        }
         private void LoadRecentChecks()
         {
             DB db = new DB();
@@ -197,3 +263,4 @@ namespace WindowsFormsApp1
         }
     }
 }
+
