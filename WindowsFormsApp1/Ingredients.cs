@@ -18,6 +18,8 @@ namespace WindowsFormsApp1
     {
         int selectedDishId = 0;
         int selectedProductId = 0;
+        private bool markupColumnReady = false;
+        private bool markupWarned = false;
 
         public Ingredients()
         {
@@ -28,6 +30,7 @@ namespace WindowsFormsApp1
         private void Ingredients_Load(object sender, EventArgs e)
         {
             EnsureAmountColumnSupportsKg();
+            markupColumnReady = EnsureDishMarkupColumnSupportsAutoPricing();
             LoadDishesCombo();
             LoadProductsCombo();
             labelDishCost.Text = "0.00";
@@ -638,6 +641,7 @@ namespace WindowsFormsApp1
                 object value = command.ExecuteScalar();
                 decimal cost = (value == null || value == DBNull.Value) ? 0m : Convert.ToDecimal(value);
                 labelDishCost.Text = cost.ToString("0.00", CultureInfo.InvariantCulture);
+                SaveDishPriceByMarkup(db, dishId, cost);
             }
             catch (Exception ex)
             {
@@ -647,6 +651,76 @@ namespace WindowsFormsApp1
             {
                 db.closeConnection();
             }
+        }
+
+        private void SaveDishPriceByMarkup(DB db, int dishId, decimal costPrice)
+        {
+            SqlCommand command;
+            if (markupColumnReady)
+            {
+                command = new SqlCommand(
+                    "UPDATE Dishes " +
+                    "SET Cost = CAST(ROUND(@costPrice * (1 + (MarkupPercent / 100.0)), 0) AS int) " +
+                    "WHERE ID_dish=@id",
+                    db.getConnection());
+            }
+            else
+            {
+                command = new SqlCommand(
+                    "UPDATE Dishes SET Cost = CAST(ROUND(@costPrice * 1.30, 0) AS int) WHERE ID_dish=@id",
+                    db.getConnection());
+                if (!markupWarned)
+                {
+                    markupWarned = true;
+                    MessageBox.Show("Колонка MarkupPercent не создана в БД. Временный расчет цены идет с наценкой 30%.");
+                }
+            }
+            var p = command.Parameters.Add("@costPrice", SqlDbType.Decimal);
+            p.Precision = 18;
+            p.Scale = 3;
+            p.Value = costPrice;
+            command.Parameters.Add("@id", SqlDbType.Int).Value = dishId;
+            command.ExecuteNonQuery();
+        }
+
+        private bool EnsureDishMarkupColumnSupportsAutoPricing()
+        {
+            DB db = new DB();
+            try
+            {
+                db.openConnection();
+                SqlCommand command = new SqlCommand(
+                    "IF COL_LENGTH('Dishes', 'MarkupPercent') IS NULL " +
+                    "BEGIN " +
+                    "ALTER TABLE Dishes ADD MarkupPercent decimal(5,2) NULL; " +
+                    "UPDATE Dishes SET MarkupPercent = 30 WHERE MarkupPercent IS NULL; " +
+                    "ALTER TABLE Dishes ALTER COLUMN MarkupPercent decimal(5,2) NOT NULL; " +
+                    "END " +
+                    "ELSE " +
+                    "BEGIN " +
+                    "UPDATE Dishes SET MarkupPercent = 30 WHERE MarkupPercent IS NULL; " +
+                    "END",
+                    db.getConnection());
+                command.ExecuteNonQuery();
+                return DishMarkupColumnExists(db);
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                db.closeConnection();
+            }
+        }
+
+        private bool DishMarkupColumnExists(DB db)
+        {
+            SqlCommand check = new SqlCommand(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='Dishes' AND COLUMN_NAME='MarkupPercent'",
+                db.getConnection());
+            int count = Convert.ToInt32(check.ExecuteScalar());
+            return count > 0;
         }
     }
     }

@@ -18,6 +18,7 @@ namespace WindowsFormsApp1
     {
         int id_dish = 0;int id_type = 0;
         string data;
+        private bool markupColumnReady = false;
         public Dishes(string data)
         {
             InitializeComponent();
@@ -40,7 +41,7 @@ namespace WindowsFormsApp1
         private void Dishes_Load(object sender, EventArgs e)
         {
             dataGridView1.ReadOnly = true;
-            String name_dish = this.data;
+            markupColumnReady = EnsureDishMarkupColumnSupportsAutoPricing();
             DB db = new DB();
             MarkupPercent.Text = "30";
 
@@ -85,7 +86,7 @@ namespace WindowsFormsApp1
 
         private void button4_Click(object sender, EventArgs e)
         {
-            if (!TryGetDishPrice(out int cost))
+            if (!TryGetMarkupPercent(out decimal markupPercent))
             {
                 return;
             }
@@ -117,11 +118,22 @@ namespace WindowsFormsApp1
                     MessageBox.Show("Такое блюдо уже есть");
                 else
                 {
-                    command = new SqlCommand("INSERT INTO Dishes (Name_of_dish,Type_of_dish,Cost) VALUES (@name , @type , @cost)", db.getConnection());
+                    int cost = 0; // no ingredients yet
+                    if (markupColumnReady)
+                        command = new SqlCommand("INSERT INTO Dishes (Name_of_dish,Type_of_dish,Cost,MarkupPercent) VALUES (@name , @type , @cost, @markup)", db.getConnection());
+                    else
+                        command = new SqlCommand("INSERT INTO Dishes (Name_of_dish,Type_of_dish,Cost) VALUES (@name , @type , @cost)", db.getConnection());
 
                     command.Parameters.Add("@name", SqlDbType.NVarChar).Value = name_dish;
                     command.Parameters.Add("@type", SqlDbType.NVarChar).Value = id_type;
                     command.Parameters.Add("@cost", SqlDbType.Int).Value = cost;
+                    if (markupColumnReady)
+                    {
+                        var markup = command.Parameters.Add("@markup", SqlDbType.Decimal);
+                        markup.Precision = 5;
+                        markup.Scale = 2;
+                        markup.Value = markupPercent;
+                    }
 
                     db.openConnection();
 
@@ -195,50 +207,49 @@ namespace WindowsFormsApp1
 
         private void button5_Click(object sender, EventArgs e)
         {
-            String name_dish = name.Text;
-
-
             DB db = new DB();
-
-
-            SqlCommand command = new SqlCommand("DELETE FROM Dishes WHERE Name_of_dish=@name", db.getConnection());
-            command.Parameters.Add("@name", SqlDbType.NVarChar).Value = name_dish;
-
-
-            db.openConnection();
-
-            if (command.ExecuteNonQuery() == 1)
-                MessageBox.Show("Блюдо удалено");
-            else
-                MessageBox.Show("Error...");
-
-
-            dataGridView1.Rows.Clear();
-
-            command = new SqlCommand("SELECT Name_of_dish,Cost,ISNULL(TypeOfDish,'') AS TypeOfDish FROM Dishes LEFT JOIN Type_of_Dishes on Dishes.Type_of_dish=Type_of_Dishes.Type_of_d ", db.getConnection());
-
-            SqlDataReader reader = command.ExecuteReader();
-
-            List<string[]> list = new List<string[]>();
-
-
-            while (reader.Read())
+            try
             {
-                list.Add(new string[3]);
+                if (!TryResolveSelectedDishId(db, out int dishId))
+                {
+                    MessageBox.Show("Сначала выберите блюдо в таблице");
+                    return;
+                }
 
-                list[list.Count - 1][0] = reader[0].ToString();
-                list[list.Count - 1][1] = reader[1].ToString();
-                list[list.Count - 1][2] = reader[2].ToString();
+                db.openConnection();
+
+                if (IsDishInActiveOrders(db, dishId))
+                {
+                    MessageBox.Show("Нельзя удалить: блюдо есть в активных заказах");
+                    return;
+                }
+
+                SqlCommand delCalc = new SqlCommand("DELETE FROM Calculation WHERE ID_dish=@id", db.getConnection());
+                delCalc.Parameters.Add("@id", SqlDbType.Int).Value = dishId;
+                delCalc.ExecuteNonQuery();
+
+                SqlCommand command = new SqlCommand("DELETE FROM Dishes WHERE ID_dish=@id", db.getConnection());
+                command.Parameters.Add("@id", SqlDbType.Int).Value = dishId;
+
+                if (command.ExecuteNonQuery() == 1)
+                    MessageBox.Show("Блюдо удалено");
+                else
+                    MessageBox.Show("Блюдо не найдено");
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show("Нельзя удалить: есть связанные записи.\n" + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                db.closeConnection();
             }
 
-            reader.Close();
-
-            db.closeConnection();
-            foreach (string[] s in list)
-            {
-                dataGridView1.Rows.Add(s);
-            }
-            db.closeConnection();
+            RefreshDishesGrid();
         }
 
         private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -299,7 +310,7 @@ namespace WindowsFormsApp1
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (!TryGetDishPrice(out int cost))
+            if (!TryGetMarkupPercent(out decimal markupPercent))
             {
                 return;
             }
@@ -332,11 +343,22 @@ namespace WindowsFormsApp1
 
                 reader2.Close();
 
+                decimal costPrice = GetDishCostPrice(id_dish, db);
+                int cost = Convert.ToInt32(Math.Round(costPrice + (costPrice * markupPercent / 100m), 0, MidpointRounding.AwayFromZero));
+
                 SqlCommand command = new SqlCommand("UPDATE Dishes SET Name_of_dish=@name,Type_of_dish=@type,Cost=@cost WHERE ID_dish=@id", db.getConnection());
                 command.Parameters.Add("@id", SqlDbType.NVarChar).Value = id_dish;
                 command.Parameters.Add("@name", SqlDbType.NVarChar).Value = name.Text;
                 command.Parameters.Add("@type", SqlDbType.NVarChar).Value = id_type;
                 command.Parameters.Add("@cost", SqlDbType.Int).Value = cost;
+                if (markupColumnReady)
+                {
+                    var markup = command.Parameters.Add("@markup", SqlDbType.Decimal);
+                    markup.Precision = 5;
+                    markup.Scale = 2;
+                    markup.Value = markupPercent;
+                    command.CommandText = "UPDATE Dishes SET Name_of_dish=@name,Type_of_dish=@type,Cost=@cost,MarkupPercent=@markup WHERE ID_dish=@id";
+                }
 
                 if (command.ExecuteNonQuery() == 1)
                     MessageBox.Show("Блюдо changed");
@@ -421,6 +443,18 @@ namespace WindowsFormsApp1
             return true;
         }
 
+        private bool TryGetMarkupPercent(out decimal markupPercent)
+        {
+            markupPercent = 0m;
+            if (!TryParseDecimal(MarkupPercent.Text, out markupPercent) || markupPercent < 0)
+            {
+                MessageBox.Show("Введите корректный процент наценки");
+                return false;
+            }
+
+            return true;
+        }
+
         private void LoadCostPrice(int dishId)
         {
             DB db = new DB();
@@ -437,6 +471,22 @@ namespace WindowsFormsApp1
                 object result = command.ExecuteScalar();
                 decimal costPrice = (result == null || result == DBNull.Value) ? 0m : Convert.ToDecimal(result);
                 CostPrice.Text = costPrice.ToString("0.###", CultureInfo.InvariantCulture);
+
+                if (markupColumnReady)
+                {
+                    SqlCommand markupCommand = new SqlCommand("SELECT ISNULL(MarkupPercent,30) FROM Dishes WHERE ID_dish=@id", db.getConnection());
+                    markupCommand.Parameters.Add("@id", SqlDbType.Int).Value = dishId;
+                    object markupValue = markupCommand.ExecuteScalar();
+                    if (markupValue != null && markupValue != DBNull.Value)
+                    {
+                        MarkupPercent.Text = Convert.ToDecimal(markupValue).ToString("0.##", CultureInfo.InvariantCulture);
+                    }
+                }
+                else
+                {
+                    MarkupPercent.Text = "30";
+                }
+
                 RecalculatePriceFromCostPrice();
             }
             catch (Exception ex)
@@ -447,6 +497,130 @@ namespace WindowsFormsApp1
             {
                 db.closeConnection();
             }
+        }
+
+        private void RefreshDishesGrid()
+        {
+            DB db = new DB();
+            try
+            {
+                db.openConnection();
+                dataGridView1.Rows.Clear();
+                SqlCommand command = new SqlCommand(
+                    "SELECT Name_of_dish,Cost,ISNULL(TypeOfDish,'') AS TypeOfDish FROM Dishes LEFT JOIN Type_of_Dishes on Dishes.Type_of_dish=Type_of_Dishes.Type_of_d",
+                    db.getConnection());
+                SqlDataReader reader = command.ExecuteReader();
+                List<string[]> list = new List<string[]>();
+                while (reader.Read())
+                {
+                    list.Add(new string[3]);
+                    list[list.Count - 1][0] = reader[0].ToString();
+                    list[list.Count - 1][1] = reader[1].ToString();
+                    list[list.Count - 1][2] = reader[2].ToString();
+                }
+                reader.Close();
+                foreach (string[] s in list)
+                {
+                    dataGridView1.Rows.Add(s);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                db.closeConnection();
+            }
+        }
+
+        private bool TryResolveSelectedDishId(DB db, out int dishId)
+        {
+            dishId = id_dish;
+            if (dishId > 0)
+                return true;
+
+            string dishName = name.Text?.Trim();
+            if (string.IsNullOrWhiteSpace(dishName))
+                return false;
+
+            db.openConnection();
+            SqlCommand command = new SqlCommand("SELECT TOP 1 ID_dish FROM Dishes WHERE Name_of_dish=@name", db.getConnection());
+            command.Parameters.Add("@name", SqlDbType.NVarChar).Value = dishName;
+            object value = command.ExecuteScalar();
+            db.closeConnection();
+
+            if (value == null || value == DBNull.Value)
+                return false;
+
+            dishId = Convert.ToInt32(value);
+            id_dish = dishId;
+            return true;
+        }
+
+        private bool IsDishInActiveOrders(DB db, int dishId)
+        {
+            SqlCommand command = new SqlCommand(
+                "SELECT COUNT(*) " +
+                "FROM Orders o " +
+                "WHERE o.ID_dish=@id " +
+                "AND NOT EXISTS (SELECT 1 FROM Check_Form c WHERE c.ID_order=o.ID_order)",
+                db.getConnection());
+            command.Parameters.Add("@id", SqlDbType.Int).Value = dishId;
+            int activeCount = Convert.ToInt32(command.ExecuteScalar());
+            return activeCount > 0;
+        }
+
+        private decimal GetDishCostPrice(int dishId, DB db)
+        {
+            SqlCommand command = new SqlCommand(
+                "SELECT ISNULL(SUM(CAST(Calculation.Amount AS decimal(18,3)) * CAST(Products.Cost AS decimal(18,2))), 0) " +
+                "FROM Calculation INNER JOIN Products ON Calculation.ID_product = Products.ID_product " +
+                "WHERE Calculation.ID_dish=@id",
+                db.getConnection());
+            command.Parameters.Add("@id", SqlDbType.Int).Value = dishId;
+            object result = command.ExecuteScalar();
+            return (result == null || result == DBNull.Value) ? 0m : Convert.ToDecimal(result);
+        }
+
+        private bool EnsureDishMarkupColumnSupportsAutoPricing()
+        {
+            DB db = new DB();
+            try
+            {
+                db.openConnection();
+                SqlCommand command = new SqlCommand(
+                    "IF COL_LENGTH('Dishes', 'MarkupPercent') IS NULL " +
+                    "BEGIN " +
+                    "ALTER TABLE Dishes ADD MarkupPercent decimal(5,2) NULL; " +
+                    "UPDATE Dishes SET MarkupPercent = 30 WHERE MarkupPercent IS NULL; " +
+                    "ALTER TABLE Dishes ALTER COLUMN MarkupPercent decimal(5,2) NOT NULL; " +
+                    "END " +
+                    "ELSE " +
+                    "BEGIN " +
+                    "UPDATE Dishes SET MarkupPercent = 30 WHERE MarkupPercent IS NULL; " +
+                    "END",
+                    db.getConnection());
+                command.ExecuteNonQuery();
+                return DishMarkupColumnExists(db);
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                db.closeConnection();
+            }
+        }
+
+        private bool DishMarkupColumnExists(DB db)
+        {
+            SqlCommand check = new SqlCommand(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='Dishes' AND COLUMN_NAME='MarkupPercent'",
+                db.getConnection());
+            int count = Convert.ToInt32(check.ExecuteScalar());
+            return count > 0;
         }
     }
 }
