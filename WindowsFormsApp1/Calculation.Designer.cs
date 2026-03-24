@@ -30,7 +30,6 @@
         {
             this.button1 = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.Dish = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Product = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Amount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Sum = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -44,6 +43,12 @@
             this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.lblExpenseValue = new System.Windows.Forms.Label();
+            this.lblIncomeValue = new System.Windows.Forms.Label();
+            this.lblProfitValue = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -62,7 +67,6 @@
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Dish,
             this.Product,
             this.Amount,
             this.Sum,
@@ -72,13 +76,6 @@
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.Size = new System.Drawing.Size(670, 395);
             this.dataGridView1.TabIndex = 20;
-            // 
-            // Dish
-            // 
-            this.Dish.HeaderText = "Блюдо";
-            this.Dish.MinimumWidth = 6;
-            this.Dish.Name = "Dish";
-            this.Dish.Width = 170;
             // 
             // Product
             // 
@@ -195,11 +192,74 @@
             this.label5.TabIndex = 29;
             this.label5.Text = "Период расчета";
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(594, 105);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(90, 13);
+            this.label6.TabIndex = 31;
+            this.label6.Text = "Итог. расход:";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(594, 124);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(87, 13);
+            this.label7.TabIndex = 32;
+            this.label7.Text = "Итог. приход:";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(594, 143);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(94, 13);
+            this.label8.TabIndex = 33;
+            this.label8.Text = "Итог. прибыль:";
+            // 
+            // lblExpenseValue
+            // 
+            this.lblExpenseValue.AutoSize = true;
+            this.lblExpenseValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblExpenseValue.Location = new System.Drawing.Point(694, 105);
+            this.lblExpenseValue.Name = "lblExpenseValue";
+            this.lblExpenseValue.Size = new System.Drawing.Size(32, 13);
+            this.lblExpenseValue.TabIndex = 34;
+            this.lblExpenseValue.Text = "0.00";
+            // 
+            // lblIncomeValue
+            // 
+            this.lblIncomeValue.AutoSize = true;
+            this.lblIncomeValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblIncomeValue.Location = new System.Drawing.Point(694, 124);
+            this.lblIncomeValue.Name = "lblIncomeValue";
+            this.lblIncomeValue.Size = new System.Drawing.Size(32, 13);
+            this.lblIncomeValue.TabIndex = 35;
+            this.lblIncomeValue.Text = "0.00";
+            // 
+            // lblProfitValue
+            // 
+            this.lblProfitValue.AutoSize = true;
+            this.lblProfitValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblProfitValue.Location = new System.Drawing.Point(694, 143);
+            this.lblProfitValue.Name = "lblProfitValue";
+            this.lblProfitValue.Size = new System.Drawing.Size(32, 13);
+            this.lblProfitValue.TabIndex = 36;
+            this.lblProfitValue.Text = "0.00";
+            // 
             // Calculation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1042, 663);
+            this.Controls.Add(this.lblProfitValue);
+            this.Controls.Add(this.lblIncomeValue);
+            this.Controls.Add(this.lblExpenseValue);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.dateTimePicker2);
             this.Controls.Add(this.dateTimePicker1);
             this.Controls.Add(this.button2);
@@ -231,12 +291,17 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.DateTimePicker dateTimePicker1;
         private System.Windows.Forms.DateTimePicker dateTimePicker2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Dish;
         private System.Windows.Forms.DataGridViewTextBoxColumn Product;
         private System.Windows.Forms.DataGridViewTextBoxColumn Amount;
         private System.Windows.Forms.DataGridViewTextBoxColumn Sum;
         private System.Windows.Forms.DataGridViewTextBoxColumn Unit;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label lblExpenseValue;
+        private System.Windows.Forms.Label lblIncomeValue;
+        private System.Windows.Forms.Label lblProfitValue;
     }
 }

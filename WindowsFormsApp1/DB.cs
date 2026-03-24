@@ -4,7 +4,7 @@ namespace WindowsFormsApp1
 {
     class DB
     {
-        SqlConnection connection = new SqlConnection(@"Data Source=HOME-PC\SQLEXPRESS;Initial Catalog=RKP1;Integrated Security=True");
+        SqlConnection connection = new SqlConnection(@"Data Source=Zhanat;Initial Catalog=RKP1;Integrated Security=True;TrustServerCertificate=True");
 
         public void openConnection()
         {

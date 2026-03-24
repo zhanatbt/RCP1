@@ -14,6 +14,10 @@ namespace WindowsFormsApp1
 {
     public partial class Calculation : Form
     {
+        private decimal totalExpense = 0m;
+        private decimal totalIncome = 0m;
+        private decimal totalProfit = 0m;
+
         public Calculation()
         {
             InitializeComponent();
@@ -21,6 +25,7 @@ namespace WindowsFormsApp1
             UIStyle.AddRefreshButton(this, () => new Calculation());
             dateTimePicker1.Format = DateTimePickerFormat.Short;
             dateTimePicker2.Format = DateTimePickerFormat.Short;
+            UpdateTotalsDisplay();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -47,7 +52,7 @@ namespace WindowsFormsApp1
             db.openConnection();
 
             SqlCommand command = new SqlCommand(
-                "SELECT d.Name_of_dish, p.Name_of_prod, " +
+                "SELECT p.Name_of_prod, " +
                 "SUM(CAST(c.Amount AS decimal(18,3)) * o.Amount) AS AmountSpent, " +
                 "SUM(CAST(p.Cost AS decimal(18,2)) * CAST(c.Amount AS decimal(18,3)) * o.Amount) AS CostSpent, " +
                 "u.Unit " +
@@ -59,8 +64,8 @@ namespace WindowsFormsApp1
                 "INNER JOIN Unit u ON p.ID_unit=u.ID_unit " +
                 "WHERE cf.Date_of_order >= @dtFrom AND cf.Date_of_order < DATEADD(day,1,@dtTo) " +
                 "AND o.Date_of_order >= @dtFrom AND o.Date_of_order < DATEADD(day,1,@dtTo) " +
-                "GROUP BY d.Name_of_dish, p.Name_of_prod, u.Unit " +
-                "ORDER BY d.Name_of_dish, p.Name_of_prod",
+                "GROUP BY p.Name_of_prod, u.Unit " +
+                "ORDER BY p.Name_of_prod",
                 db.getConnection());
             command.Parameters.Add("@dtFrom", SqlDbType.DateTime).Value = dateFrom;
             command.Parameters.Add("@dtTo", SqlDbType.DateTime).Value = dateTo;
@@ -69,25 +74,39 @@ namespace WindowsFormsApp1
 
             List<string[]> list = new List<string[]>();
 
+            totalExpense = 0m;
 
             while (reader.Read())
             {
-                list.Add(new string[5]);
+                list.Add(new string[4]);
 
                 list[list.Count - 1][0] = reader[0].ToString();
                 list[list.Count - 1][1] = reader[1].ToString();
                 list[list.Count - 1][2] = reader[2].ToString();
                 list[list.Count - 1][3] = reader[3].ToString();
-                list[list.Count - 1][4] = reader[4].ToString();
+
+                totalExpense += Convert.ToDecimal(reader[2]);
             }
 
             reader.Close();
+
+            SqlCommand incomeCommand = new SqlCommand(
+                "SELECT ISNULL(SUM(CAST(Summ AS decimal(18,2))), 0) " +
+                "FROM Check_Form " +
+                "WHERE Date_of_order >= @dtFrom AND Date_of_order < DATEADD(day,1,@dtTo)",
+                db.getConnection());
+            incomeCommand.Parameters.Add("@dtFrom", SqlDbType.DateTime).Value = dateFrom;
+            incomeCommand.Parameters.Add("@dtTo", SqlDbType.DateTime).Value = dateTo;
+            totalIncome = Convert.ToDecimal(incomeCommand.ExecuteScalar());
+            totalProfit = totalIncome - totalExpense;
 
             db.closeConnection();
             foreach (string[] s in list)
             {
                 dataGridView1.Rows.Add(s);
             }
+
+            UpdateTotalsDisplay();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -109,6 +128,9 @@ namespace WindowsFormsApp1
             DateTime dateFrom = dateTimePicker2.Value.Date;
             DateTime dateTo = dateTimePicker1.Value.Date;
             sb.AppendLine("Период: " + dateFrom.ToString("dd.MM.yyyy") + " - " + dateTo.ToString("dd.MM.yyyy"));
+            sb.AppendLine("Итоговый расход: " + totalExpense.ToString("0.00"));
+            sb.AppendLine("Итоговый приход: " + totalIncome.ToString("0.00"));
+            sb.AppendLine("Итоговая прибыль: " + totalProfit.ToString("0.00"));
             sb.AppendLine();
 
             for (int c = 0; c < dataGridView1.Columns.Count; c++)
@@ -132,6 +154,13 @@ namespace WindowsFormsApp1
 
             File.WriteAllText(save.FileName, sb.ToString(), Encoding.UTF8);
             MessageBox.Show("Экспортировано в Excel-файл:\n" + save.FileName);
+        }
+
+        private void UpdateTotalsDisplay()
+        {
+            lblExpenseValue.Text = totalExpense.ToString("0.00");
+            lblIncomeValue.Text = totalIncome.ToString("0.00");
+            lblProfitValue.Text = totalProfit.ToString("0.00");
         }
     }
 }
